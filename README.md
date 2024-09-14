@@ -1,0 +1,29 @@
+# MCTS-ToT
+An implementation of the SELF-REFINE iterative feedback and refinement approach for LLMs using Ollama
+
+## Installation
+1) Install Python 3.10+ and Ollama
+
+2) Install Python dependencies
+```sh
+pip install -r requirements.txt
+```
+
+3) Install an Ollama model (default model used: `gemma2:2b-instruct-q5_0`)
+
+## Usage
+1) Edit constants.py if required (e.g. you are using a different Ollama model)
+
+2) Run OllamaSelfRefine
+```sh
+python3 main.py
+```
+
+## Related works
+- Ding, Ruomeng, et al. ‘Everything of Thoughts: Defying the Law of Penrose Triangle for Thought Generation’. arXiv [Cs.AI], 7 Nov. 2023, http://arxiv.org/abs/2311.04254. arXiv.
+
+## References
+- Madaan, Aman, et al. ‘Self-Refine: Iterative Refinement with Self-Feedback’. arXiv [Cs.CL], 2023, http://arxiv.org/abs/2303.17651. arXiv.
+- Zhang, Di, et al. ‘Accessing GPT-4 Level Mathematical Olympiad Solutions via Monte Carlo Tree Self-Refine with LLaMa-3 8B’. arXiv [Cs.AI], 11 June 2024, http://arxiv.org/abs/2406.07394. arXiv.
+- Saravia, Elvis. ‘Prompt Engineering Guide’. https://github.com/dair-ai/Prompt-Engineering-Guide, 12 2022.
+- ChatGPT. "Combining Research and Prompting" OpenAI, 14 Sept. 2024, https://chatgpt.com/share/66e4f655-8774-8005-bb25-5c6b6846b657.
