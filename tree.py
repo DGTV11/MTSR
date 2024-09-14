@@ -73,7 +73,7 @@ class ThoughtNode:
             new_node = ThoughtNode(self.previous_chat_history, self.model_name, self)
             # Generate next reasoning step
             tmp_chat_history = self.previous_chat_history+[wrap_chat_message('assistant', self.previous_agent_thoughts), wrap_chat_message('user', EXPANSION_PROMPT)]
-            tmp_chat_history.append(ollama.chat(model=self.model_name, messages=tmp_chat_history, options={'num_ctx': CTX_WINDOW})['message']['content'])
+            tmp_chat_history.append(ollama.chat(model=self.model_name, messages=tmp_chat_history, options={'num_ctx': CTX_WINDOW}))
             
             # Refine next reasoning step
             initial_query = self.previous_chat_history[-1]['content']
