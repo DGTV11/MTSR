@@ -24,7 +24,6 @@ while True:
     thoughts = ""
     for step in search(global_chat_history, OLLAMA_LLM):
         clear_shell()
-        print(step['finished'])
         if step['finished']:
             thoughts = step["thoughts"]
             match step["finished"]:

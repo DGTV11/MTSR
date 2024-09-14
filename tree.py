@@ -80,12 +80,12 @@ class ThoughtNode:
 
             ## Get feedback
             tmp_chat_history.append(wrap_chat_message("user", FEEDBACK_PROMPT.replace('$QUERY', initial_query)))
-            assistant_message_content = ollama.chat(model=model_name, messages=tmp_chat_history, options={'num_ctx': CTX_WINDOW})["message"]["content"]
+            assistant_message_content = ollama.chat(model=self.model_name, messages=tmp_chat_history, options={'num_ctx': CTX_WINDOW})["message"]["content"]
             tmp_chat_history.append(wrap_chat_message("assistant", assistant_message_content))
 
             ## Refine reasoning step
             tmp_chat_history.append(wrap_chat_message("user", REFINE_PROMPT.replace('$QUERY', initial_query)))
-            assistant_message_content = ollama.chat(model=model_name, messages=tmp_chat_history, options={'num_ctx': CTX_WINDOW})["message"]["content"]
+            assistant_message_content = ollama.chat(model=self.model_name, messages=tmp_chat_history, options={'num_ctx': CTX_WINDOW})["message"]["content"]
             new_node.reasoning_step = assistant_message_content
 
             # Evaluate reasoning step
