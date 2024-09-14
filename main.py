@@ -48,7 +48,7 @@ while True:
     for chunk in ollama.chat(model=self.model_name, messages=tmp_chat_history, stream=True, options={'num_ctx': CTX_WINDOW}):
         response += chunk['message']['content']
         print(chunk['message']['content'], end="", flush=True)
-    global_chat_history.append(wrap_chat_message("assistant", thoughts+'\n\n'=response))
+    global_chat_history.append(wrap_chat_message("assistant", thoughts+'\n\n'+response))
 
     clear_shell()
     for message in global_chat_history:

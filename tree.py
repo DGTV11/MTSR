@@ -94,7 +94,6 @@ class ThoughtNode:
             for i in range(NUMBER_OF_REWARD_SAMPLES):
                 while True:
                     evaluation_raw_txt = ollama.chat(model=self.model_name, messages=tmp_chat_history, options={'num_ctx': CTX_WINDOW})['message']['content']
-                   get list inside deque # regex to extract required strings
                     reg_str = "<output>(.*?)</output>"
                     res = re.findall(reg_str, evaluation_raw_txt)
                     if not res:
