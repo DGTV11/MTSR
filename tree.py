@@ -165,17 +165,17 @@ class ThoughtNode:
                     new_node.is_search_finished = (
                         False  # Not enough data to determine diminishing returns
                     )
+                else:
+                    # Calculate the improvements between consecutive Q-values
+                    improvements = [
+                        self.q_values[i] - self.q_values[i - 1]
+                        for i in range(1, len(self.q_values))
+                    ]
 
-                # Calculate the improvements between consecutive Q-values
-                improvements = [
-                    self.q_values[i] - self.q_values[i - 1]
-                    for i in range(1, len(self.q_values))
-                ]
-
-                # Check if improvements are below the threshold
-                new_node.is_search_finished = 2 * all(
-                    abs(improvement) < threshold for improvement in improvements
-                )
+                    # Check if improvements are below the threshold
+                    new_node.is_search_finished = 2 * all(
+                        abs(improvement) < threshold for improvement in improvements
+                    )
             if not new_node.is_search_finished:  ## Check for max search depth
                 new_node.is_search_finished = 3 * (
                     len(new_node.agent_thoughts_list) >= MAX_SEARCH_DEPTH

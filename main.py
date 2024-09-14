@@ -46,7 +46,7 @@ while True:
     tmp_chat_history = global_chat_history[:-1] + [
         wrap_chat_message(
             "user",
-            f"QUERY: \"{global_chat_history[-1]['content']}\"\n\nYOUR REASONING:\n{thoughts}\n\nGenerate a final response based on the given query and the reasoning steps that you have generated.",
+            f"QUERY: \"{global_chat_history[-1]['content']}\"\n\nYOUR HIDDEN REASONING:\n{thoughts}\n\nGenerate a final response based on the given query and the hidden reasoning steps that you have generated. You MUST not use <thoughts> tags, as they are ONLY to be used during your HIDDEN reasoning!",
         )
     ]
     response = ""
@@ -70,4 +70,3 @@ while True:
     print(
         f'Finished reasoning with a Q value of {step["q_value"]} because of {finished_reason}.'
     )
-    print(f"DEBUG: {thoughts}")
