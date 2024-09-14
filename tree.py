@@ -70,8 +70,10 @@ class ThoughtNode:
     def expand_node(self):
         for i in range(NUMBER_OF_NEW_NODES_PER_EXPANSION):
             # Create new node
+            print(f'Creating thought node {i+1}/{NUMBER_OF_NEW_NODES_PER_EXPANSION}')
             new_node = ThoughtNode(self.previous_chat_history, self.model_name, self)
             # Generate next reasoning step
+            print('Generating next reasoning step')
             tmp_chat_history = self.previous_chat_history+[wrap_chat_message('assistant', self.previous_agent_thoughts), wrap_chat_message('user', EXPANSION_PROMPT)]
             tmp_chat_history.append(ollama.chat(model=self.model_name, messages=tmp_chat_history, options={'num_ctx': CTX_WINDOW}))
             
@@ -79,19 +81,23 @@ class ThoughtNode:
             initial_query = self.previous_chat_history[-1]['content']
 
             ## Get feedback
+            print('Getting feedback for generated reasoning step')
             tmp_chat_history.append(wrap_chat_message("user", FEEDBACK_PROMPT.replace('$QUERY', initial_query)))
             assistant_message_content = ollama.chat(model=self.model_name, messages=tmp_chat_history, options={'num_ctx': CTX_WINDOW})["message"]["content"]
             tmp_chat_history.append(wrap_chat_message("assistant", assistant_message_content))
 
-            ## Refine reasoning step
+            ## Update reasoning step
+            print('Updating generated reasoning step')
             tmp_chat_history.append(wrap_chat_message("user", REFINE_PROMPT.replace('$QUERY', initial_query)))
             assistant_message_content = ollama.chat(model=self.model_name, messages=tmp_chat_history, options={'num_ctx': CTX_WINDOW})["message"]["content"]
             new_node.reasoning_step = assistant_message_content
 
             # Evaluate reasoning step
+            print('Evaluating refined reasoning step')
             tmp_chat_history = self.previous_chat_history+[wrap_chat_message('assistant', self.previous_agent_thoughts), wrap_chat_message('user', EXPANSION_PROMPT), wrap_chat_message('assistant', new_node.reasoning_step), wrap_chat_message('user', EVALUATION_PROMPT.replace('$QUERY', initial_query))]
             r = []
-            for i in range(NUMBER_OF_REWARD_SAMPLES):
+            for j in range(NUMBER_OF_REWARD_SAMPLES):
+                print(f'Getting sample {j+1}/{NUMBER_OF_REWARD_SAMPLES}')
                 while True:
                     evaluation_raw_txt = ollama.chat(model=self.model_name, messages=tmp_chat_history, options={'num_ctx': CTX_WINDOW})['message']['content']
                     reg_str = "<output>(.*?)</output>"
@@ -109,6 +115,7 @@ class ThoughtNode:
             new_node.n_value = NUMBER_OF_REWARD_SAMPLES
 
             # Check if node is terminal
+            print('Checking if reasoning is finished')
             ## Check for definite search completion
             new_node.is_search_finished = 1*(new_node.q_value >= TERMINAL_SCORE_THRESHOLD)
             if not new_node.is_search_finished: ## Check for diminishing returns
@@ -147,11 +154,16 @@ class ThoughtNode:
 def search(previous_chat_history, model_name):
     current_node = ThoughtNode(previous_chat_history, model_name)
 
+    search_depth = 0
     while not current_node.is_search_finished:
         yield {'finished': False, 'thoughts': current_node.agent_thoughts, 'q_value': current_node.q_value}
+        print(f'Latest completed search depth: {search_depth}')
         current_node.expand_node()
         current_node.backpropagate()
         current_node.uct_update_children()
         current_node = current_node.select()
+        search_depth += 1
+
+    print(f'Latest completed search depth: {search_depth}')
 
     return {'finished': True, 'reason': current_node.is_search_finished, 'thoughts': current_node.agent_thoughts, 'q_value': current_node.q_value}
