@@ -7,7 +7,7 @@ OLLAMA_LLM = "gemma2:2b-instruct-q5_0"
 
 ## System variables
 CTX_WINDOW = 8192
-MAX_SEARCH_DEPTH = 25
+MAX_SEARCH_DEPTH = 5 #TODO: Use moar prompting to make this adaptive
 NUMBER_OF_NEW_NODES_PER_EXPANSION = 3
 NUMBER_OF_REWARD_SAMPLES = 3
 NUMBER_OF_TERMINAL_CHECK_SAMPLES = 3
