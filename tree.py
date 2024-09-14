@@ -174,7 +174,7 @@ class ThoughtNode:
 
                     # Check if improvements are below the threshold
                     new_node.is_search_finished = 2 * all(
-                        abs(improvement) < threshold for improvement in improvements
+                        abs(improvement) < DIMINISHING_RETURNS_THRESHOLD for improvement in improvements
                     )
             if not new_node.is_search_finished:  ## Check for max search depth
                 new_node.is_search_finished = 3 * (
