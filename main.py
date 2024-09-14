@@ -24,6 +24,7 @@ while True:
     thoughts = ""
     for step in search(global_chat_history, OLLAMA_LLM):
         clear_shell()
+        print(step['finished'])
         if step['finished']:
             thoughts = step["thoughts"]
             match step["finished"]:
@@ -34,10 +35,10 @@ while True:
                 case 3:
                     finished_reason = "maximum search depth reached"
             print(f'Finished reasoning with a Q value of {step["q_value"]} because of {finished_reason}.')
-            print(f'Thoughts:\n\n{thoughts}\n\n')
+            print(f'Thoughts:\n\n{thoughts}\n\nResponse:')
         else:
-            print(f'Best node has a Q value of {step["q_value"]}')
-            print(f'Thoughts:\n{step["thoughts"]}\n\nResponse:')
+            print(f'Current best node has a Q value of {step["q_value"]}')
+            print(f'Thoughts:\n{step["thoughts"]}')
 
     tmp_chat_history = (
         global_chat_history[:-1] + [
@@ -45,7 +46,7 @@ while True:
         ]
     )
     response = ""
-    for chunk in ollama.chat(model=self.model_name, messages=tmp_chat_history, stream=True, options={'num_ctx': CTX_WINDOW}):
+    for chunk in ollama.chat(model=OLLAMA_LLM, messages=tmp_chat_history, stream=True, options={'num_ctx': CTX_WINDOW}):
         response += chunk['message']['content']
         print(chunk['message']['content'], end="", flush=True)
     global_chat_history.append(wrap_chat_message("assistant", thoughts+'\n\n'+response))
