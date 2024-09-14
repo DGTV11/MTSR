@@ -87,7 +87,7 @@ class ThoughtNode:
             tmp_chat_history.append(wrap_chat_message("assistant", assistant_message_content))
 
             ## Update reasoning step
-            print('Updating generated reasoning step')
+            print('Updating reasoning step')
             tmp_chat_history.append(wrap_chat_message("user", REFINE_PROMPT.replace('$QUERY', initial_query)))
             assistant_message_content = ollama.chat(model=self.model_name, messages=tmp_chat_history, options={'num_ctx': CTX_WINDOW})["message"]["content"]
             new_node.reasoning_step = assistant_message_content
@@ -102,17 +102,14 @@ class ThoughtNode:
                 while True:
                     print(f'Attempt no. {k}')
                     evaluation_raw_txt = ollama.chat(model=self.model_name, messages=tmp_chat_history, options={'num_ctx': CTX_WINDOW})['message']['content']
-                    reg_str = "<output>(.*?)</output>"
+                    reg_str = "<output>(\d+)</output>"
                     res = re.findall(reg_str, evaluation_raw_txt)
                     if not res:
-                        continue
-                    try:
-                        single_r = min(max(int(res[-1]), -100), 100)
-                        single_r -= OVERSCORE_REDUCTION_CONSTANT*(single_r > 95)
-                        r.append(single_r)
-                    except:
                         k += 1
                         continue
+                    single_r = min(max(int(res[-1]), -100), 100)
+                    single_r -= OVERSCORE_REDUCTION_CONSTANT*(single_r > 95)
+                    r.append(single_r)
 
             new_node.q_value = 0.5*(min(r)+(sum(r)/NUMBER_OF_REWARD_SAMPLES))
             new_node.n_value = NUMBER_OF_REWARD_SAMPLES
