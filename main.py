@@ -33,7 +33,7 @@ while True:
                     finished_reason = "diminishing returns"
                 case 3:
                     finished_reason = "maximum search depth reached"
-            print(f'Finished reasoning with a Q value of {step["q_value"} because of {finished_reason}.')
+            print(f'Finished reasoning with a Q value of {step["q_value"]} because of {finished_reason}.')
             print(f'Thoughts:\n\n{thoughts}\n\n')
         else:
             print(f'Best node has a Q value of {step["q_value"]}')
