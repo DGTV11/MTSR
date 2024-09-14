@@ -98,14 +98,15 @@ class ThoughtNode:
             r = []
             for j in range(NUMBER_OF_REWARD_SAMPLES):
                 print(f'Getting sample {j+1}/{NUMBER_OF_REWARD_SAMPLES}')
-                k = 1
-                while True:
+                k = 0
+                res = []
+                while not res:
+                    k += 1
                     print(f'Attempt no. {k}')
                     evaluation_raw_txt = ollama.chat(model=self.model_name, messages=tmp_chat_history, options={'num_ctx': CTX_WINDOW})['message']['content']
-                    reg_str = "<output>(\d+)</output>"
+                    reg_str = r"<output>(\d+)</output>"
                     res = re.findall(reg_str, evaluation_raw_txt)
                     if not res:
-                        k += 1
                         continue
                     single_r = min(max(int(res[-1]), -100), 100)
                     single_r -= OVERSCORE_REDUCTION_CONSTANT*(single_r > 95)
