@@ -2,7 +2,7 @@ from os import system as shell
 from os import name as os_name
 import re
 
-import ollama
+from llm import *
 
 from constants import *
 from tree import search
@@ -41,10 +41,9 @@ while True:
         while not res:
             j += 1
             print(f"Attempt no. {j}")
-            evaluation_raw_txt = ollama.chat(
-                model=OLLAMA_LLM,
+            evaluation_raw_txt = chat(
+                model=API_CONFIG['model'],
                 messages=tmp_chat_history,
-                options={"num_ctx": CTX_WINDOW},
             )["message"]["content"]
             reg_str = r"<output>(\d+)</output>"
             res = re.findall(reg_str, evaluation_raw_txt)
@@ -57,7 +56,7 @@ while True:
 
     # Thinking
     thoughts = ""
-    for step in search(global_chat_history, OLLAMA_LLM, max_search_depth):
+    for step in search(global_chat_history, API_CONFIG['model'], max_search_depth):
         clear_shell()
         if step["finished"]:
             thoughts = step["thoughts"]
@@ -83,15 +82,11 @@ while True:
             GENERATION_PROMPT.replace('$QUERY', global_chat_history[-1]['content']).replace('$THOUGHTS', thoughts)
         )
     ]
-    response = ""
-    for chunk in ollama.chat(
-        model=OLLAMA_LLM,
+    response = chat(
+        model=API_CONFIG['model'],
         messages=tmp_chat_history,
-        stream=True,
-        options={"num_ctx": CTX_WINDOW},
-    ):
-        response += chunk["message"]["content"]
-        print(chunk["message"]["content"], end="", flush=True)
+    )["message"]["content"]
+    print(response)
     global_chat_history.append(
         wrap_chat_message("assistant", thoughts + "\n\n" + response)
     )
@@ -102,5 +97,5 @@ while True:
             continue
         print(f"{message['role']} > {message['content']}")
     print(
-        f'Finished reasoning with a Q value of {step["q_value"]} because of {finished_reason}.'
+        f'=============================\nFinished reasoning with a Q value of {step["q_value"]} because of {finished_reason}.'
     )

@@ -1,7 +1,7 @@
 import re, math
 from collections import deque
 
-import ollama
+from llm import *
 
 from constants import *
 
@@ -72,10 +72,12 @@ class ThoughtNode:
                 wrap_chat_message("user", EXPANSION_PROMPT),
             ]
             tmp_chat_history.append(
-                ollama.chat(
-                    model=self.model_name,
-                    messages=tmp_chat_history,
-                    options={"num_ctx": CTX_WINDOW},
+                wrap_chat_message(
+                    "assistant", 
+                    chat(
+                        model=self.model_name,
+                        messages=tmp_chat_history,
+                    )["message"]["content"]
                 )
             )
 
@@ -89,10 +91,9 @@ class ThoughtNode:
                     "user", FEEDBACK_PROMPT.replace("$QUERY", initial_query)
                 )
             )
-            assistant_message_content = ollama.chat(
+            assistant_message_content = chat(
                 model=self.model_name,
                 messages=tmp_chat_history,
-                options={"num_ctx": CTX_WINDOW},
             )["message"]["content"]
             tmp_chat_history.append(
                 wrap_chat_message("assistant", assistant_message_content)
@@ -105,10 +106,9 @@ class ThoughtNode:
                     "user", REFINE_PROMPT.replace("$QUERY", initial_query)
                 )
             )
-            assistant_message_content = ollama.chat(
+            assistant_message_content = chat(
                 model=self.model_name,
                 messages=tmp_chat_history,
-                options={"num_ctx": CTX_WINDOW},
             )["message"]["content"]
             new_node.reasoning_step = assistant_message_content
             print("Reasoning step to be evaluated:")
@@ -133,10 +133,9 @@ class ThoughtNode:
                 while not res:
                     k += 1
                     print(f"Attempt no. {k}")
-                    evaluation_raw_txt = ollama.chat(
+                    evaluation_raw_txt = chat(
                         model=self.model_name,
                         messages=tmp_chat_history,
-                        options={"num_ctx": CTX_WINDOW},
                     )["message"]["content"]
                     reg_str = r"<output>(\d+)</output>"
                     res = re.findall(reg_str, evaluation_raw_txt)
