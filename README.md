@@ -26,5 +26,6 @@ python3 main.py
 - Madaan, Aman, et al. ‘Self-Refine: Iterative Refinement with Self-Feedback’. arXiv [Cs.CL], 2023, http://arxiv.org/abs/2303.17651. arXiv.
 - Zhang, Di, et al. ‘Accessing GPT-4 Level Mathematical Olympiad Solutions via Monte Carlo Tree Self-Refine with LLaMa-3 8B’. arXiv [Cs.AI], 11 June 2024, http://arxiv.org/abs/2406.07394. arXiv.
 - Saravia, Elvis. ‘Prompt Engineering Guide’. https://github.com/dair-ai/Prompt-Engineering-Guide, 12 2022.
-- ChatGPT. "Combining Research and Prompting" OpenAI, 14 Sept. 2024, https://chatgpt.com/share/66e53529-7408-8005-9feb-0c04c823c4de.
+- ChatGPT. "Combining Research and Prompting" OpenAI, 14 Sept. 2024, https://chatgpt.com/share/66e4f655-8774-8005-bb25-5c6b6846b657.
+- ChatGPT. "Importance vs Greedy Sampling" OpenAI, 14 Sept. 2024, https://chatgpt.com/share/66e53529-7408-8005-9feb-0c04c823c4de.
 - Yao, Shunyu, et al. ‘Tree of Thoughts: Deliberate Problem Solving with Large Language Models’. arXiv [Cs.CL], 17 May 2023, http://arxiv.org/abs/2305.10601. arXiv.

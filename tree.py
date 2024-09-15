@@ -68,7 +68,7 @@ class ThoughtNode:
 
         return list(values)
 
-    def expand_node(self):
+    def expand_node(self, max_search_depth):
         for i in range(NUMBER_OF_NEW_NODES_PER_EXPANSION):
             # Create new node
             print(f"Creating thought node {i+1}/{NUMBER_OF_NEW_NODES_PER_EXPANSION}")
@@ -178,7 +178,7 @@ class ThoughtNode:
                     )
             if not new_node.is_search_finished:  ## Check for max search depth
                 new_node.is_search_finished = 3 * (
-                    len(new_node.agent_thoughts_list) >= MAX_SEARCH_DEPTH
+                    len(new_node.agent_thoughts_list) >= max_search_depth 
                 )
 
             # Append node to children
@@ -208,7 +208,7 @@ class ThoughtNode:
         return max(self.children, key=lambda c: c.uct_value)
 
 
-def search(previous_chat_history, model_name):
+def search(previous_chat_history, model_name, max_search_depth):
     current_node = ThoughtNode(previous_chat_history, model_name)
 
     search_depth = 0
@@ -219,7 +219,7 @@ def search(previous_chat_history, model_name):
             "q_value": current_node.q_value,
         }
         print(f"Latest completed search depth: {search_depth}")
-        current_node.expand_node()
+        current_node.expand_node(max_search_depth)
         current_node.backpropagate()
         current_node.uct_update_children()
         current_node = current_node.select()
