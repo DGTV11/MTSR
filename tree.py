@@ -218,7 +218,7 @@ def search(previous_chat_history, model_name, max_search_depth):
             "thoughts": current_node.agent_thoughts,
             "q_value": current_node.q_value,
         }
-        print(f"Latest completed search depth: {search_depth}")
+        print(f"Latest completed search depth: {search_depth}/{max_search_depth}")
         current_node.expand_node(max_search_depth)
         current_node.backpropagate()
         current_node.uct_update_children()
