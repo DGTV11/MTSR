@@ -18,7 +18,7 @@ def clear_shell():
     else:
         shell("clear")
 
-
+clear_shell()
 while True:
     user_message = input("user > ")
     global_chat_history.append(wrap_chat_message("user", user_message))
