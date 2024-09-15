@@ -178,7 +178,7 @@ class ThoughtNode:
                     )
             if not new_node.is_search_finished:  ## Check for max search depth
                 new_node.is_search_finished = 3 * (
-                    len(new_node.agent_thoughts_list) >= max_search_depth 
+                    len(new_node.agent_thoughts_list)-1 >= max_search_depth 
                 )
 
             # Append node to children
