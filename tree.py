@@ -111,6 +111,9 @@ class ThoughtNode:
                 options={"num_ctx": CTX_WINDOW},
             )["message"]["content"]
             new_node.reasoning_step = assistant_message_content
+            print("Reasoning step to be evaluated:")
+            print(new_node.reasoning_step)
+            print()
 
             # Evaluate reasoning step
             print("Evaluating refined reasoning step")
@@ -145,6 +148,7 @@ class ThoughtNode:
 
             new_node.q_value = 0.5 * (min(r) + (sum(r) / NUMBER_OF_REWARD_SAMPLES))
             new_node.n_value = NUMBER_OF_REWARD_SAMPLES
+            print(f"Reasoning step got a Q value of {new_node.q_value}")
 
             # Check if node is terminal
             print("Checking if reasoning is finished")
@@ -175,6 +179,7 @@ class ThoughtNode:
 
             # Append node to children
             self.children.append(new_node)
+            print('\n')
 
             # Check if expansion should stop early
             if self.parent and new_node.q_value > self.q_value:
