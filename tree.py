@@ -25,37 +25,29 @@ class ThoughtNode:
         self.is_search_finished = False
 
     @property
+    def agent_thoughts_deque(self):
+        reasoning_steps = deque()
+
+        node = self
+        while node:
+            reasoning_steps.appendleft(node.reasoning_step)
+            node = node.parent
+
+        reasoning_steps.popleft()
+
+        return reasoning_steps
+
+    @property
     def previous_agent_thoughts(self):
-        previous_reasoning_steps = deque()
-
-        node_parent = self.parent
-        while node_parent:
-            previous_reasoning_steps.appendleft(node_parent.reasoning_step)
-            node_parent = node_parent.parent
-
+        previous_reasoning_steps = self.agent_thoughts_deque
+        if previous_reasoning_steps:
+            previous_reasoning_steps.pop()
         return f'<thoughts>\n{"\n\n".join(previous_reasoning_steps)}\n</thoughts>'
 
     @property
     def agent_thoughts(self):
-        reasoning_steps = deque()
-
-        node = self
-        while node:
-            reasoning_steps.appendleft(node.reasoning_step)
-            node = node.parent
-
+        reasoning_steps = self.agent_thoughts_deque
         return f'<thoughts>\n{"\n\n".join(reasoning_steps)}\n</thoughts>'
-
-    @property
-    def agent_thoughts_list(self):
-        reasoning_steps = deque()
-
-        node = self
-        while node:
-            reasoning_steps.appendleft(node.reasoning_step)
-            node = node.parent
-
-        return list(reasoning_steps)
 
     @property
     def q_values(self):
@@ -178,7 +170,7 @@ class ThoughtNode:
                     )
             if not new_node.is_search_finished:  ## Check for max search depth
                 new_node.is_search_finished = 3 * (
-                    len(new_node.agent_thoughts_list)-1 >= max_search_depth 
+                    len(new_node.agent_thoughts_deque) >= max_search_depth 
                 )
 
             # Append node to children
