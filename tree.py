@@ -110,7 +110,7 @@ class ThoughtNode:
                 model=self.model_name,
                 messages=tmp_chat_history,
             )["message"]["content"]
-            new_node.reasoning_step = assistant_message_content
+            new_node.reasoning_step = assistant_message_content.strip().replace("<thoughts>", "").replace("</thoughts>", "") # Half-working but it will have to do
             print("Reasoning step to be evaluated:")
             print(new_node.reasoning_step)
             print()
