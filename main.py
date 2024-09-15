@@ -1,5 +1,6 @@
 from os import system as shell
 from os import name as os_name
+import re
 
 import ollama
 
@@ -23,7 +24,7 @@ while True:
     global_chat_history.append(wrap_chat_message("user", user_message))
 
     # Estimation of required no. of rollouts
-    clear_shell
+    clear_shell()
     estimations = []
     for i, estimation_type in enumerate(THREE_POINT_ESTIMATE_TYPES):
         print(f"Getting max depth estimate {i+1}/{len(THREE_POINT_ESTIMATE_TYPES)} ({estimation_type.lower()} estimate)")
