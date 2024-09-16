@@ -9,7 +9,7 @@ OLLAMA_LLM = "gemma2:2b-instruct-q5_0"
 SEARCH_DEPTH_CAP = 50
 NUMBER_OF_NEW_NODES_PER_EXPANSION = 3
 NUMBER_OF_REWARD_SAMPLES = 3
-THREE_POINT_ESTIMATE_TYPES = ['MOST OPTIMISTIC', "MOST LIKELY", "MOST PESSIMISTIC"]
+THREE_POINT_ESTIMATE_TYPES = ["MOST OPTIMISTIC", "MOST LIKELY", "MOST PESSIMISTIC"]
 NUMBER_OF_TERMINAL_CHECK_SAMPLES = 3
 TERMINAL_SCORE_THRESHOLD = 85
 DIMINISHING_RETURNS_THRESHOLD = 0.01
@@ -31,4 +31,4 @@ REFINE_PROMPT = "Give me a revised reasoning step, incorporating all necessary i
 
 EVALUATION_PROMPT = f'Analyse the generated reasoning step strictly and directly. Your analysis MUST be based on HOW COMPLETE AND HELPFUL the chain of thought made up of ALL of the generated reasoning steps is in AUGMENTING AND AIDING IN the generation of a WELL-WRITTEN answer to the inital query, "$QUERY". Do NOT give entirely positive feedback - you MUST find AS MANY things that CAN AND MUST be improved as possible (e.g. phrasing, content, factuality). You are capable of giving strict and direct feedback that is specific and actionable, and therefore MUST do so. DO NOT REFUSE TO MAKE AN EVALUATION!!! After your reasoning, you ABSOLUTELY MUST output an INTEGER score between [-100,+100] (i.e. from -100 to +100) between <output> tags (e.g. <output>0</output> for a final score of 0). Remember, this final score ABSOLUTELY MUST be generated AFTER ALL OF THE REASONING! The <output> tags ABSOLUTELY MUST ONLY BE USED TO ENCLOSE THE FINAL OUTPUT!!! Never, EVER give a neutral score like 0, YOU MUST CAREFULLY REASON YOUR WAY TO A SCORE REFLECTIVE ON HOW WELL-WRITTEN THE CHAIN OF THOUGHT IS. ANY score above {TERMINAL_SCORE_THRESHOLD} denotes a COMPLETE chain of thought - if you find that the resultant chain of thought is SUFFICIENT and COMPLETE, you MUST give a score ABOVE OR EQUAL TO {TERMINAL_SCORE_THRESHOLD}. Prompt format: "[reasoning] Final score: <output>[score]</output>". Let\'s think step by step.'
 
-GENERATION_PROMPT = "QUERY: \"$QUERY\"\n\nYOUR HIDDEN REASONING:\n$THOUGHTS\n\nGenerate a response based on the given query and the hidden reasoning steps that you have generated. You MUST not use <thoughts> tags, as they are ONLY to be used during your HIDDEN reasoning! You ABSOLUTELY MUST generate a response, as the user CAN NOT see your hidden reasoning, ONLY your final response!"
+GENERATION_PROMPT = "QUERY: \"$QUERY\"\n\nYOUR HIDDEN REASONING:\n$THOUGHTS\n\nGenerate a response based on the given query and the hidden reasoning steps that you have generated. You MUST not use <thoughts> tags, as they are ONLY to be used during your HIDDEN reasoning! You ABSOLUTELY MUST generate a response, as the user CAN NOT see your hidden reasoning, ONLY your final response! You MUST respond to the query completely and accurately - your hidden reasoning is just there to guide you in making a better final response!"
