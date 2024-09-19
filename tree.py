@@ -67,9 +67,11 @@ class ThoughtNode:
             new_node = ThoughtNode(self.previous_chat_history, self.model_name, self)
             # Generate next reasoning step
             print("Generating next reasoning step")
-            tmp_chat_history = self.previous_chat_history + [
-                wrap_chat_message("assistant", self.previous_agent_thoughts),
-                wrap_chat_message("user", EXPANSION_PROMPT),
+            tmp_chat_history = self.previous_chat_history[:-1] + [
+                wrap_chat_message(
+                    "user",
+                    EXPANSION_PROMPT.replace('$QUERY', self.previous_chat_history[-1]['content']).replace('$THOUGHTS', self.previous_agent_thoughts)
+                ),
             ]
             tmp_chat_history.append(
                 wrap_chat_message(
