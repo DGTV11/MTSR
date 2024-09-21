@@ -1,3 +1,4 @@
+import sys
 from os import system as shell
 from os import name as os_name
 import re
@@ -20,7 +21,8 @@ def clear_shell():
 
 clear_shell()
 while True:
-    user_message = input("user > ")
+    print("user (press Ctrl+C to finish) >")
+    user_message = sys.stdin.read()
     global_chat_history.append(wrap_chat_message("user", user_message))
 
     # Estimation of required no. of rollouts
