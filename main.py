@@ -21,7 +21,7 @@ def clear_shell():
 
 clear_shell()
 while True:
-    print("user (press Ctrl+C to finish) >")
+    print("user (press Ctrl+D to finish) >")
     user_message = sys.stdin.read()
     global_chat_history.append(wrap_chat_message("user", user_message))
 
