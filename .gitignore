@@ -177,3 +177,4 @@ pyrightconfig.json
 ._*
 config.ini
 config.ini.bak
+llm-out.log
