@@ -1,9 +1,14 @@
+import logging
 import configparser
 import os
 
 import openai
 
 CONFIG_FILE = 'config.ini'
+LOG_FILE = 'llm-out.log'
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename=LOG_FILE, level=logging.INFO)
 
 apis = {
     'OpenAI': {
@@ -49,8 +54,11 @@ def chat(model, messages):
         model=model,
         messages=messages
     )
+
+    # Logging
+    logger.info(f'{model} gave a response of: {response.choices[0].message.content if response.choices else None}')
     
     # Return the full message content
-    return {'message': {'role': 'user', 'content': response.choices[0].message.content if response.choices else None}}
+    return {'message': {'role': 'assistant', 'content': response.choices[0].message.content if response.choices else None}}
 
 
