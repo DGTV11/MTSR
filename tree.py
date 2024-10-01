@@ -42,12 +42,18 @@ class ThoughtNode:
         previous_reasoning_steps = self.agent_thoughts_deque
         if previous_reasoning_steps:
             previous_reasoning_steps.pop()
-        return f'<thoughts>\n{"\n\n".join(previous_reasoning_steps)}\n</thoughts>'
+
+        wrap_step = lambda s: f"<thought>\n{s}\n</thought>"
+
+        return f'<thoughts>\n{"\n".join([wrap_step(step) for step in previous_reasoning_steps])}\n</thoughts>'
 
     @property
     def agent_thoughts(self):
         reasoning_steps = self.agent_thoughts_deque
-        return f'<thoughts>\n{"\n\n".join(reasoning_steps)}\n</thoughts>'
+
+        wrap_step = lambda s: f"<thought>\n{s}\n</thought>"
+
+        return f'<thoughts>\n{"\n".join([wrap_step(step) for step in reasoning_steps])}\n</thoughts>'
 
     @property
     def q_values(self):
@@ -112,7 +118,7 @@ class ThoughtNode:
                 model=self.model_name,
                 messages=tmp_chat_history,
             )["message"]["content"]
-            new_node.reasoning_step = assistant_message_content.strip().replace("<thoughts>", "").replace("</thoughts>", "") # Half-working but it will have to do
+            new_node.reasoning_step = assistant_message_content.strip().replace("<thoughts>", "").replace("</thoughts>", "").replace("<thought>", "").replace("</thought>", "") # Half-working but it will have to do
             print("Reasoning step to be evaluated:")
             print(new_node.reasoning_step)
             print()
