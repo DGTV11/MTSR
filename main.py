@@ -90,14 +90,21 @@ while True:
     )["message"]["content"]
     print(response)
     global_chat_history.append(
-        wrap_chat_message("assistant", thoughts + "\n\n" + response)
+        wrap_chat_message("assistant", response)
     )
 
     clear_shell()
-    for message in global_chat_history:
+    for i, message in enumerate(global_chat_history, start=1):
         if message["role"] == "system":
             continue
-        print(f"{message['role']} > {message['content']}")
+
+        if i < len(global_chat_history):
+            print(f"{message['role']} > {message['content']}")
+        else:
+            if thoughts:
+                print(f"{message['role']} > {message['content']}")
+            else:
+                print(f"{message['role']} (thoughts shown) > {thoughts}\n\n{message['content']}")
     print(
         f'=============================\nFinished reasoning with a Q value of {step["q_value"]} because of {finished_reason}.'
     )
