@@ -101,10 +101,7 @@ while True:
         if i < len(global_chat_history):
             print(f"{message['role']} > {message['content']}")
         else:
-            if thoughts:
-                print(f"{message['role']} > {message['content']}")
-            else:
-                print(f"{message['role']} (thoughts shown) > {thoughts}\n\n{message['content']}")
+            print(f"{message['role']} (with thoughts) > {thoughts}\n\n{message['content']}")
     print(
         f'=============================\nFinished reasoning with a Q value of {step["q_value"]} because of {finished_reason}.'
     )
