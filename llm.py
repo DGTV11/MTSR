@@ -15,10 +15,10 @@ apis = {
         'endpoint': 'https://api.openai.com/v1/'
     },
     'Groq': {
-        'endpoint': 'https://api.groq.com/openai/v1/'  # Example endpoint URL
+        'endpoint': 'https://api.groq.com/openai/v1/'
     },
     'Ollama': {
-        'endpoint': 'http://localhost:11434/v1/'  # Example endpoint URL
+        'endpoint': 'http://localhost:11434/v1/'
     }
 }
 
@@ -30,28 +30,48 @@ def load_config():
 
 def get_api_config():
     config = load_config()
-    for api_name in apis.keys():
+    config_obj = {}
+
+    for api_name in map(lambda s: s+'_reasoning', apis.keys()):
         if api_name in config:
-            return {
-                'endpoint': apis[api_name]['endpoint'],
+            config_obj['reasoning'] = {
+                'endpoint': apis[api_name.replace('_reasoning', '')]['endpoint'],
                 'model': config.get(api_name, 'model', fallback=None),
                 'api_key': config.get(api_name, 'api_key', fallback=None)
             }
-    return None
+            break
+    else:
+        return None
+    
+    for api_name in map(lambda s: s+'_response', apis.keys()):
+        if api_name in config:
+            config_obj['response'] = {
+                'endpoint': apis[api_name.replace('_response', '')]['endpoint'],
+                'model': config.get(api_name, 'model', fallback=None),
+                'api_key': config.get(api_name, 'api_key', fallback=None)
+            }
+            break
+    else:
+        return None
+
+    return config_obj
 
 API_CONFIG = get_api_config()
 
 # Main Chat Function
 def chat(model, messages):
+    '''
+    model -> 'reasoning' or 'response'
+    '''
     if API_CONFIG is None:
         raise ValueError("API configuration not found.")
     
-    openai.base_url = API_CONFIG['endpoint']
-    openai.api_key = API_CONFIG['api_key']
+    openai.base_url = API_CONFIG[model]['endpoint']
+    openai.api_key = API_CONFIG[model]['api_key']
     
     # Get full response without streaming
     response = openai.chat.completions.create(
-        model=model,
+        model=API_CONFIG[model]['model'],
         messages=messages
     )
 

@@ -19,6 +19,11 @@ def clear_shell():
     else:
         shell("clear")
 
+'''
+def clear_shell():
+    pass
+'''
+
 clear_shell()
 while True:
     print("user (press Ctrl+D to finish) >")
@@ -44,7 +49,7 @@ while True:
             j += 1
             print(f"Attempt no. {j}")
             evaluation_raw_txt = chat(
-                model=API_CONFIG['model'],
+                model='reasoning',
                 messages=tmp_chat_history,
             )["message"]["content"]
             reg_str = r"<output>(\d+)</output>"
@@ -58,7 +63,7 @@ while True:
 
     # Thinking
     thoughts = ""
-    for step in search(global_chat_history, API_CONFIG['model'], max_search_depth):
+    for step in search(global_chat_history, max_search_depth):
         clear_shell()
         if step["finished"]:
             thoughts = step["thoughts"]
@@ -85,7 +90,7 @@ while True:
         )
     ]
     response = chat(
-        model=API_CONFIG['model'],
+        model='response',
         messages=tmp_chat_history,
     )["message"]["content"]
     print(response)

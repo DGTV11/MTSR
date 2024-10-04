@@ -9,9 +9,8 @@ wrap_chat_message = lambda role, content: {"role": role, "content": content}
 
 
 class ThoughtNode:
-    def __init__(self, previous_chat_history=None, model_name=None, parent=None):
+    def __init__(self, previous_chat_history=None, parent=None):
         self.previous_chat_history = previous_chat_history
-        self.model_name = model_name
 
         self.parent = parent
         self.children = []
@@ -70,7 +69,7 @@ class ThoughtNode:
         for i in range(NUMBER_OF_NEW_NODES_PER_EXPANSION):
             # Create new node
             print(f"Creating thought node {i+1}/{NUMBER_OF_NEW_NODES_PER_EXPANSION}")
-            new_node = ThoughtNode(self.previous_chat_history, self.model_name, self)
+            new_node = ThoughtNode(self.previous_chat_history, self)
             # Generate next reasoning step
             print("Generating next reasoning step")
             tmp_chat_history = self.previous_chat_history[:-1] + [
@@ -83,7 +82,7 @@ class ThoughtNode:
                 wrap_chat_message(
                     "assistant", 
                     chat(
-                        model=self.model_name,
+                        model='reasoning',
                         messages=tmp_chat_history,
                     )["message"]["content"]
                 )
@@ -100,7 +99,7 @@ class ThoughtNode:
                 )
             )
             assistant_message_content = chat(
-                model=self.model_name,
+                model='reasoning',
                 messages=tmp_chat_history,
             )["message"]["content"]
             tmp_chat_history.append(
@@ -115,7 +114,7 @@ class ThoughtNode:
                 )
             )
             assistant_message_content = chat(
-                model=self.model_name,
+                model='reasoning',
                 messages=tmp_chat_history,
             )["message"]["content"]
             new_node.reasoning_step = assistant_message_content.strip().replace("<thoughts>", "").replace("</thoughts>", "").replace("<thought>", "").replace("</thought>", "") # Half-working but it will have to do
@@ -142,7 +141,7 @@ class ThoughtNode:
                     k += 1
                     print(f"Attempt no. {k}")
                     evaluation_raw_txt = chat(
-                        model=self.model_name,
+                        model='reasoning',
                         messages=tmp_chat_history,
                     )["message"]["content"]
                     reg_str = r"<output>(\d+)</output>"
@@ -212,8 +211,8 @@ class ThoughtNode:
         return max(self.children, key=lambda c: c.uct_value)
 
 
-def search(previous_chat_history, model_name, max_search_depth):
-    current_node = ThoughtNode(previous_chat_history, model_name)
+def search(previous_chat_history, max_search_depth):
+    current_node = ThoughtNode(previous_chat_history)
 
     search_depth = 0
     while not current_node.is_search_finished:
