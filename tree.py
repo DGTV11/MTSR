@@ -75,7 +75,7 @@ class ThoughtNode:
             tmp_chat_history = self.previous_chat_history[:-1] + [
                 wrap_chat_message(
                     "user",
-                    EXPANSION_PROMPT.replace('$QUERY', self.previous_chat_history[-1]['content']).replace('$THOUGHTS', self.previous_agent_thoughts)/.replace('$STEP', current_search_depth).replace('$TOTAL_NO_STEPS', max_search_depth)
+                    EXPANSION_PROMPT.replace('$QUERY', self.previous_chat_history[-1]['content']).replace('$THOUGHTS', self.previous_agent_thoughts).replace('$STEP', current_search_depth).replace('$TOTAL_NO_STEPS', max_search_depth)
                 ),
             ]
             tmp_chat_history.append(
