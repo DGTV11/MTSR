@@ -2,6 +2,8 @@ import sys
 from os import system as shell
 from os import name as os_name
 import re
+import time
+import datetime
 
 from llm import *
 
@@ -29,6 +31,8 @@ while True:
     print("user (press Ctrl+D to finish) >")
     user_message = sys.stdin.read()
     global_chat_history.append(wrap_chat_message("user", user_message))
+
+    start_time = time.time()
 
     # Estimation of required no. of rollouts
     clear_shell()
@@ -98,6 +102,9 @@ while True:
         wrap_chat_message("assistant", response)
     )
 
+    end_time = time()
+    time_taken = end_time - start_time
+
     clear_shell()
     for i, message in enumerate(global_chat_history, start=1):
         if message["role"] == "system":
@@ -108,5 +115,5 @@ while True:
         else:
             print(f"{message['role']} (with thoughts) > {thoughts}\n\n{message['content']}")
     print(
-        f'=============================\nFinished reasoning with a Q value of {step["q_value"]} because of {finished_reason}.'
+        f'=============================\nFinished reasoning with a Q value of {step["q_value"]} in {str(datetime.timedelta(seconds=time_taken))} because of {finished_reason}.'
     )
