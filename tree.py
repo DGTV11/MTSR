@@ -65,7 +65,7 @@ class ThoughtNode:
 
         return list(values)
 
-    def expand_node(self, max_search_depth):
+    def expand_node(self, max_search_depth, current_search_depth):
         for i in range(NUMBER_OF_NEW_NODES_PER_EXPANSION):
             # Create new node
             print(f"Creating thought node {i+1}/{NUMBER_OF_NEW_NODES_PER_EXPANSION}")
@@ -75,7 +75,7 @@ class ThoughtNode:
             tmp_chat_history = self.previous_chat_history[:-1] + [
                 wrap_chat_message(
                     "user",
-                    EXPANSION_PROMPT.replace('$QUERY', self.previous_chat_history[-1]['content']).replace('$THOUGHTS', self.previous_agent_thoughts)
+                    EXPANSION_PROMPT.replace('$QUERY', self.previous_chat_history[-1]['content']).replace('$THOUGHTS', self.previous_agent_thoughts)/.replace('$STEP', current_search_depth).replace('$TOTAL_NO_STEPS', max_search_depth)
                 ),
             ]
             tmp_chat_history.append(
@@ -222,7 +222,7 @@ def search(previous_chat_history, max_search_depth):
             "q_value": current_node.q_value,
         }
         print(f"Current search depth: {search_depth+1}/{max_search_depth}")
-        current_node.expand_node(max_search_depth)
+        current_node.expand_node(max_search_depth, search_depth+1)
         current_node.backpropagate()
         current_node.uct_update_children()
         current_node = current_node.select()

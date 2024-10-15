@@ -23,8 +23,8 @@ python3 main.py
 ```
 
 ## TODO
-- Implement json mode (header, thought, next_action) like in g1
-    - e.g. next_action s: reason, final_response, stop
+- Implement json mode (title, thought, next_action) like in g1
+    - e.g. next_action: reason, final_response, stop
 
 ## Related works
 - Ding, Ruomeng, et al. ‘Everything of Thoughts: Defying the Law of Penrose Triangle for Thought Generation’. arXiv [Cs.AI], 7 Nov. 2023, http://arxiv.org/abs/2311.04254. arXiv.
