@@ -71,6 +71,8 @@ class ThoughtNode:
         return text.replace("<thoughts>", "").replace("</thoughts>", "").replace("<thought>", "").replace("</thought>", "").replace("<reflection>", "").replace("</reflection>", "")
 
     def generate_self_reflection(self):
+        initial_query = self.previous_chat_history[-1]["content"]
+
         print(f"Generating self-reflection")
         tmp_chat_history = self.previous_chat_history[:-1] + [
             wrap_chat_message(
