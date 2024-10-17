@@ -102,7 +102,7 @@ while True:
         wrap_chat_message("assistant", response)
     )
 
-    end_time = time()
+    end_time = time.time()
     time_taken = end_time - start_time
 
     clear_shell()

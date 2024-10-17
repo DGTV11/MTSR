@@ -77,7 +77,7 @@ class ThoughtNode:
         tmp_chat_history = self.previous_chat_history[:-1] + [
             wrap_chat_message(
                 "user",
-                EXPANSION_PROMPT.replace('$QUERY', initial_query).replace('$THOUGHTS', self.previous_agent_thoughts).replace('$STEP_NP', str(current_search_depth)).replace('$TOTAL_NO_STEPS', str(max_search_depth))
+                EXPANSION_PROMPT.replace('$QUERY', initial_query).replace('$THOUGHTS', self.previous_agent_thoughts)
             ),
         ]
         self.self_reflection = self.filter_special_tags(chat(
