@@ -37,4 +37,3 @@ python3 main.py
 - ChatGPT. "Importance vs Greedy Sampling" OpenAI, 14 Sept. 2024, https://chatgpt.com/share/66e53529-7408-8005-9feb-0c04c823c4de.
 - Yao, Shunyu, et al. 'Tree of Thoughts: Deliberate Problem Solving with Large Language Models'. arXiv [Cs.CL], 17 May 2023, http://arxiv.org/abs/2305.10601. arXiv.
 - ChatGPT. "API Configuration and Models" OpenAI, 15 Sept. 2024, https://chatgpt.com/share/66e6c8c8-5e00-8005-b092-4a3fbf492765.
-- Zhang, Zhoubian, et al. 'ReST-MCTS*: LLM Self-Training via Process Reward Guided Tree Search'. arXiv [Cs.CL], 2024, https://arxiv.org/abs/2406.03816, arxiv.
