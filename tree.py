@@ -16,6 +16,7 @@ class ThoughtNode:
         self.children = []
 
         self.reasoning_step = ""
+        self.self_reflection = ""
 
         self.q_value = 0
         self.n_value = 0
@@ -29,7 +30,7 @@ class ThoughtNode:
 
         node = self
         while node:
-            reasoning_steps.appendleft(node.reasoning_step)
+            reasoning_steps.appendleft((node.reasoning_step, node.self_reflection))
             node = node.parent
 
         reasoning_steps.popleft()
@@ -42,17 +43,17 @@ class ThoughtNode:
         if previous_reasoning_steps:
             previous_reasoning_steps.pop()
 
-        wrap_step = lambda s: f"<thought>\n{s}\n</thought>"
+        wrap_step = lambda s, r: f"<thought>\n{s}\n</thought>\n<reflection>\n{r}\n</reflection>"
 
-        return f'<thoughts>\n{"\n".join([wrap_step(step) for step in previous_reasoning_steps])}\n</thoughts>'
+        return f'<thoughts>\n{"\n".join([wrap_step(step, reflection) for step, reflection in previous_reasoning_steps])}\n</thoughts>'
 
     @property
     def agent_thoughts(self):
         reasoning_steps = self.agent_thoughts_deque
 
-        wrap_step = lambda s: f"<thought>\n{s}\n</thought>"
+        wrap_step = lambda s, r: f"<thought>\n{s}\n</thought>\n<reflection>\n{r}\n</reflection>"
 
-        return f'<thoughts>\n{"\n".join([wrap_step(step) for step in reasoning_steps])}\n</thoughts>'
+        return f'<thoughts>\n{"\n".join([wrap_step(step, reflection) for step, reflection in previous_reasoning_steps])}\n</thoughts>'
 
     @property
     def q_values(self):
@@ -65,7 +66,26 @@ class ThoughtNode:
 
         return list(values)
 
+    @staticmethod
+    def filter_special_tags(text):
+        return text.replace("<thoughts>", "").replace("</thoughts>", "").replace("<thought>", "").replace("</thought>", "").replace("<reflection>", "").replace("</reflection>", "")
+
+    def generate_self_reflection(self):
+        print(f"Generating self-reflection")
+        tmp_chat_history = self.previous_chat_history[:-1] + [
+            wrap_chat_message(
+                "user",
+                EXPANSION_PROMPT.replace('$QUERY', initial_query).replace('$THOUGHTS', self.previous_agent_thoughts).replace('$STEP_NP', str(current_search_depth)).replace('$TOTAL_NO_STEPS', str(max_search_depth))
+            ),
+        ]
+        self.self_reflection = self.filter_special_tags(chat(
+            model='reasoning',
+            messages=tmp_chat_history,
+        )["message"]["content"].strip())
+    
     def expand_node(self, max_search_depth, current_search_depth):
+        initial_query = self.previous_chat_history[-1]["content"]
+
         for i in range(NUMBER_OF_NEW_NODES_PER_EXPANSION):
             # Create new node
             print(f"Creating thought node {i+1}/{NUMBER_OF_NEW_NODES_PER_EXPANSION}")
@@ -75,7 +95,7 @@ class ThoughtNode:
             tmp_chat_history = self.previous_chat_history[:-1] + [
                 wrap_chat_message(
                     "user",
-                    EXPANSION_PROMPT.replace('$QUERY', self.previous_chat_history[-1]['content']).replace('$THOUGHTS', self.previous_agent_thoughts).replace('$STEP', str(current_search_depth)).replace('$TOTAL_NO_STEPS', str(max_search_depth))
+                    EXPANSION_PROMPT.replace('$QUERY', initial_query).replace('$THOUGHTS', self.previous_agent_thoughts).replace('$STEP_NO', str(current_search_depth)).replace('$TOTAL_NO_STEPS', str(max_search_depth))
                 ),
             ]
             tmp_chat_history.append(
@@ -89,8 +109,6 @@ class ThoughtNode:
             )
 
             # Refine next reasoning step
-            initial_query = self.previous_chat_history[-1]["content"]
-
             ## Get feedback
             print("Getting feedback for generated reasoning step")
             tmp_chat_history.append(
@@ -117,7 +135,7 @@ class ThoughtNode:
                 model='reasoning',
                 messages=tmp_chat_history,
             )["message"]["content"]
-            new_node.reasoning_step = assistant_message_content.strip().replace("<thoughts>", "").replace("</thoughts>", "").replace("<thought>", "").replace("</thought>", "") # Half-working but it will have to do
+            new_node.reasoning_step = self.filter_special_tags(assistant_message_content.strip())
             print("Reasoning step to be evaluated:")
             print(new_node.reasoning_step)
             print()
@@ -226,6 +244,7 @@ def search(previous_chat_history, max_search_depth):
         current_node.backpropagate()
         current_node.uct_update_children()
         current_node = current_node.select()
+        current_node.generate_self_reflection()
         search_depth += 1
 
     print(f"Completed {search_depth} expansions")
