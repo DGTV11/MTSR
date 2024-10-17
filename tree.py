@@ -53,7 +53,7 @@ class ThoughtNode:
 
         wrap_step = lambda s, r: f"<thought>\n{s}\n</thought>\n<reflection>\n{r}\n</reflection>"
 
-        return f'<thoughts>\n{"\n".join([wrap_step(step, reflection) for step, reflection in previous_reasoning_steps])}\n</thoughts>'
+        return f'<thoughts>\n{"\n".join([wrap_step(step, reflection) for step, reflection in reasoning_steps])}\n</thoughts>'
 
     @property
     def q_values(self):
