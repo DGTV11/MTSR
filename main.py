@@ -63,7 +63,7 @@ while True:
             single_estimation = max(int(res[-1]), 1)
             estimations.append(single_estimation)
 
-    max_search_depth = min((estimations[0] + 4*estimations[1] + estimations[2]) // 6, SEARCH_DEPTH_CAP)
+    max_search_depth = min(((estimations[0] + 4*estimations[1] + estimations[2]) // 6) * MAX_ROLLOUT_ESTIMATION_MULTIPLIER, SEARCH_DEPTH_CAP)
 
     # Thinking
     thoughts = ""
