@@ -1,5 +1,5 @@
-# MCTS-ToT
-MCTSr + ToT (yea i didn't know XoT existed when I started this) 
+# MTSR
+MCTSr + ToT + Self-Reflection (yea i didn't know XoT existed when I started this) 
 
 ## Installation
 1) Install Python 3.10+ and Ollama
@@ -9,7 +9,7 @@ MCTSr + ToT (yea i didn't know XoT existed when I started this)
 pip install -r requirements.txt
 ```
 
-3) Install an Ollama model (default model used: `gemma2:2b-instruct-q5_0`)
+3) Install an Ollama model (recommended model: `gemma2:2b-instruct-q5_0`)
 
 ## Usage
 1) Do initial configuration
