@@ -1,5 +1,5 @@
 # MTSR
-MCTSr + ToT + Self-Reflection (yea i didn't know XoT existed when I started this) 
+**M**CTSr + **T**oT + **S**elf-**R**eflection (yea i didn't know XoT existed when I started this) 
 
 ## Installation
 1) Install Python 3.10+ and Ollama
