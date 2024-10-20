@@ -3,10 +3,10 @@ from constants import TERMINAL_SCORE_THRESHOLD
 # Prompt modifier variables
 THREE_POINT_ESTIMATE_TYPES = ["MOST OPTIMISTIC", "MOST LIKELY", "MOST PESSIMISTIC"]
 REASONING_PHASES = [
-    "question analysis",
-    "limitation checking and workaround finding",
-    "reasoning towards solution",
-    "checking",
+    "query breakdown and response requirement analysis",
+    "llm limitation checking and workaround finding",
+    "main reasoning towards solution",
+    "reasoning chain checking",
 ]
 
 # Prompts
