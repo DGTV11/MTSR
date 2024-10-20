@@ -44,7 +44,9 @@ class ThoughtNode:
         if previous_reasoning_steps:
             previous_reasoning_steps.pop()
 
-        wrap_step = lambda s, r: f"<thought>\n{s}\n</thought>\n<reflection>\n{r}\n</reflection>"
+        wrap_step = (
+            lambda s, r: f"<thought>\n{s}\n</thought>\n<reflection>\n{r}\n</reflection>"
+        )
 
         return f'<thoughts>\n{"\n".join([wrap_step(step, reflection) for step, reflection in previous_reasoning_steps])}\n</thoughts>'
 
@@ -52,7 +54,9 @@ class ThoughtNode:
     def agent_thoughts(self):
         reasoning_steps = self.agent_thoughts_deque
 
-        wrap_step = lambda s, r: f"<thought>\n{s}\n</thought>\n<reflection>\n{r}\n</reflection>"
+        wrap_step = (
+            lambda s, r: f"<thought>\n{s}\n</thought>\n<reflection>\n{r}\n</reflection>"
+        )
 
         return f'<thoughts>\n{"\n".join([wrap_step(step, reflection) for step, reflection in reasoning_steps])}\n</thoughts>'
 
@@ -69,7 +73,14 @@ class ThoughtNode:
 
     @staticmethod
     def filter_special_tags(text):
-        return text.replace("<thoughts>", "").replace("</thoughts>", "").replace("<thought>", "").replace("</thought>", "").replace("<reflection>", "").replace("</reflection>", "")
+        return (
+            text.replace("<thoughts>", "")
+            .replace("</thoughts>", "")
+            .replace("<thought>", "")
+            .replace("</thought>", "")
+            .replace("<reflection>", "")
+            .replace("</reflection>", "")
+        )
 
     def generate_self_reflection(self, max_search_depth, current_search_depth):
         initial_query = self.previous_chat_history[-1]["content"]
@@ -78,14 +89,21 @@ class ThoughtNode:
         tmp_chat_history = self.previous_chat_history[:-1] + [
             wrap_chat_message(
                 "user",
-                EXPANSION_PROMPT.replace('$QUERY', initial_query).replace('$THOUGHTS', self.previous_agent_thoughts).replace('$STEP_NO', str(current_search_depth)).replace('$TOTAL_NO_STEPS', str(max_search_depth))
+                EXPANSION_PROMPT.replace("$QUERY", initial_query)
+                .replace("$THOUGHTS", self.previous_agent_thoughts)
+                .replace("$STEP_NO", str(current_search_depth))
+                .replace("$TOTAL_NO_STEPS", str(max_search_depth)),
             ),
         ]
-        self.self_reflection = self.filter_special_tags(chat(
-            model='reasoning',
-            messages=tmp_chat_history,
-        )["message"]["content"].strip())
-    
+        self.self_reflection = self.filter_special_tags(
+            chat(
+                model="reasoning",
+                messages=tmp_chat_history,
+            )[
+                "message"
+            ]["content"].strip()
+        )
+
     def expand_node(self, max_search_depth, current_search_depth):
         initial_query = self.previous_chat_history[-1]["content"]
 
@@ -98,16 +116,28 @@ class ThoughtNode:
             tmp_chat_history = self.previous_chat_history[:-1] + [
                 wrap_chat_message(
                     "user",
-                    EXPANSION_PROMPT.replace('$QUERY', initial_query).replace('$THOUGHTS', self.previous_agent_thoughts).replace('$REASONING_PHASE',REASONING_PHASES[(current_search_depth-1)//(max_search_depth//len(REASONING_PHASES))]).replace('$STEP_NO', str(current_search_depth)).replace('$TOTAL_NO_STEPS', str(max_search_depth))
+                    EXPANSION_PROMPT.replace("$QUERY", initial_query)
+                    .replace("$THOUGHTS", self.previous_agent_thoughts)
+                    .replace(
+                        "$REASONING_PHASE",
+                        REASONING_PHASES[
+                            (current_search_depth - 1)
+                            // (max_search_depth // len(REASONING_PHASES))
+                        ],
+                    )
+                    .replace("$STEP_NO", str(current_search_depth))
+                    .replace("$TOTAL_NO_STEPS", str(max_search_depth)),
                 ),
             ]
             tmp_chat_history.append(
                 wrap_chat_message(
-                    "assistant", 
+                    "assistant",
                     chat(
-                        model='reasoning',
+                        model="reasoning",
                         messages=tmp_chat_history,
-                    )["message"]["content"]
+                    )[
+                        "message"
+                    ]["content"],
                 )
             )
 
@@ -120,7 +150,7 @@ class ThoughtNode:
                 )
             )
             assistant_message_content = chat(
-                model='reasoning',
+                model="reasoning",
                 messages=tmp_chat_history,
             )["message"]["content"]
             tmp_chat_history.append(
@@ -135,10 +165,12 @@ class ThoughtNode:
                 )
             )
             assistant_message_content = chat(
-                model='reasoning',
+                model="reasoning",
                 messages=tmp_chat_history,
             )["message"]["content"]
-            new_node.reasoning_step = self.filter_special_tags(assistant_message_content.strip())
+            new_node.reasoning_step = self.filter_special_tags(
+                assistant_message_content.strip()
+            )
             print("Reasoning step to be evaluated:")
             print(new_node.reasoning_step)
             print()
@@ -162,7 +194,7 @@ class ThoughtNode:
                     k += 1
                     print(f"Attempt no. {k}")
                     evaluation_raw_txt = chat(
-                        model='reasoning',
+                        model="reasoning",
                         messages=tmp_chat_history,
                     )["message"]["content"]
                     reg_str = r"<output>(\d+)</output>"
@@ -201,12 +233,12 @@ class ThoughtNode:
                     # )
             if not new_node.is_search_finished:  ## Check for max search depth
                 new_node.is_search_finished = 3 * (
-                    len(new_node.agent_thoughts_deque) >= max_search_depth 
+                    len(new_node.agent_thoughts_deque) >= max_search_depth
                 )
 
             # Append node to children
             self.children.append(new_node)
-            print('\n')
+            print("\n")
 
             # Check if expansion should stop early
             if self.parent and new_node.q_value > self.q_value:
@@ -243,11 +275,11 @@ def search(previous_chat_history, max_search_depth):
             "q_value": current_node.q_value,
         }
         print(f"Current search depth: {search_depth+1}/{max_search_depth}")
-        current_node.expand_node(max_search_depth, search_depth+1)
+        current_node.expand_node(max_search_depth, search_depth + 1)
         current_node.backpropagate()
         current_node.uct_update_children()
         current_node = current_node.select()
-        current_node.generate_self_reflection(max_search_depth, search_depth+1)
+        current_node.generate_self_reflection(max_search_depth, search_depth + 1)
         search_depth += 1
 
     print(f"Completed {search_depth} expansions")

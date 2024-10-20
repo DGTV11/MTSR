@@ -22,10 +22,11 @@ def clear_shell():
     else:
         shell("clear")
 
-'''
+
+"""
 def clear_shell():
     pass
-'''
+"""
 
 clear_shell()
 while True:
@@ -39,12 +40,19 @@ while True:
     clear_shell()
     estimations = []
     for i, estimation_type in enumerate(THREE_POINT_ESTIMATE_TYPES):
-        print(f"Getting max depth estimate {i+1}/{len(THREE_POINT_ESTIMATE_TYPES)} ({estimation_type.lower()} estimate)")
+        print(
+            f"Getting max depth estimate {i+1}/{len(THREE_POINT_ESTIMATE_TYPES)} ({estimation_type.lower()} estimate)"
+        )
 
         tmp_chat_history = global_chat_history[:-1] + [
             wrap_chat_message(
                 "user",
-                MAX_ROLLOUT_ESTIMATION_PROMPT.replace('$QUERY', global_chat_history[-1]['content'].replace('$ESTIMATION_TYPE', estimation_type))
+                MAX_ROLLOUT_ESTIMATION_PROMPT.replace(
+                    "$QUERY",
+                    global_chat_history[-1]["content"].replace(
+                        "$ESTIMATION_TYPE", estimation_type
+                    ),
+                ),
             )
         ]
 
@@ -54,9 +62,11 @@ while True:
             j += 1
             print(f"Attempt no. {j}")
             evaluation_raw_txt = chat(
-                model='reasoning',
+                model="reasoning",
                 messages=tmp_chat_history,
-            )["message"]["content"]
+            )[
+                "message"
+            ]["content"]
             reg_str = r"<output>(\d+)</output>"
             res = re.findall(reg_str, evaluation_raw_txt)
             if not res:
@@ -64,7 +74,11 @@ while True:
             single_estimation = max(int(res[-1]), 1)
             estimations.append(single_estimation)
 
-    max_search_depth = min(((estimations[0] + 4*estimations[1] + estimations[2]) // 6) * len(REASONING_PHASES), SEARCH_DEPTH_CAP)
+    max_search_depth = min(
+        ((estimations[0] + 4 * estimations[1] + estimations[2]) // 6)
+        * len(REASONING_PHASES),
+        SEARCH_DEPTH_CAP,
+    )
 
     # Thinking
     thoughts = ""
@@ -91,17 +105,19 @@ while True:
     tmp_chat_history = global_chat_history[:-1] + [
         wrap_chat_message(
             "user",
-            GENERATION_PROMPT.replace('$QUERY', global_chat_history[-1]['content']).replace('$THOUGHTS', thoughts)
+            GENERATION_PROMPT.replace(
+                "$QUERY", global_chat_history[-1]["content"]
+            ).replace("$THOUGHTS", thoughts),
         )
     ]
     response = chat(
-        model='response',
+        model="response",
         messages=tmp_chat_history,
-    )["message"]["content"]
+    )[
+        "message"
+    ]["content"]
     print(response)
-    global_chat_history.append(
-        wrap_chat_message("assistant", response)
-    )
+    global_chat_history.append(wrap_chat_message("assistant", response))
 
     end_time = time.time()
     time_taken = end_time - start_time
@@ -114,7 +130,9 @@ while True:
         if i < len(global_chat_history):
             print(f"{message['role']} > {message['content']}")
         else:
-            print(f"{message['role']} (with thoughts) > {thoughts}\n\n{message['content']}")
+            print(
+                f"{message['role']} (with thoughts) > {thoughts}\n\n{message['content']}"
+            )
     print(
         f'=============================\nFinished reasoning with a Q value of {step["q_value"]} in {str(datetime.timedelta(seconds=time_taken))} because of {finished_reason}.'
     )
