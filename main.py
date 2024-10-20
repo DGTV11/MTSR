@@ -8,6 +8,7 @@ import datetime
 from llm import *
 
 from constants import *
+from prompts import *
 from tree import search
 
 wrap_chat_message = lambda role, content: {"role": role, "content": content}
@@ -63,7 +64,7 @@ while True:
             single_estimation = max(int(res[-1]), 1)
             estimations.append(single_estimation)
 
-    max_search_depth = min(((estimations[0] + 4*estimations[1] + estimations[2]) // 6) * MAX_ROLLOUT_ESTIMATION_MULTIPLIER, SEARCH_DEPTH_CAP)
+    max_search_depth = min(((estimations[0] + 4*estimations[1] + estimations[2]) // 6) * len(REASONING_PHASES), SEARCH_DEPTH_CAP)
 
     # Thinking
     thoughts = ""
@@ -74,8 +75,8 @@ while True:
             match step["reason"]:
                 case 1:
                     finished_reason = "definite search completion"
-                case 2:
-                    finished_reason = "diminishing returns"
+                # case 2:
+                #     finished_reason = "diminishing returns"
                 case 3:
                     finished_reason = "maximum search depth reached"
             print(

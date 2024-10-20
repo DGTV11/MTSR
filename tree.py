@@ -4,6 +4,7 @@ from collections import deque
 from llm import *
 
 from constants import *
+from prompts import *
 
 wrap_chat_message = lambda role, content: {"role": role, "content": content}
 
@@ -70,14 +71,14 @@ class ThoughtNode:
     def filter_special_tags(text):
         return text.replace("<thoughts>", "").replace("</thoughts>", "").replace("<thought>", "").replace("</thought>", "").replace("<reflection>", "").replace("</reflection>", "")
 
-    def generate_self_reflection(self):
+    def generate_self_reflection(self, max_search_depth, current_search_depth):
         initial_query = self.previous_chat_history[-1]["content"]
 
         print(f"Generating self-reflection")
         tmp_chat_history = self.previous_chat_history[:-1] + [
             wrap_chat_message(
                 "user",
-                EXPANSION_PROMPT.replace('$QUERY', initial_query).replace('$THOUGHTS', self.previous_agent_thoughts)
+                EXPANSION_PROMPT.replace('$QUERY', initial_query).replace('$THOUGHTS', self.previous_agent_thoughts).replace('$STEP_NO', str(current_search_depth)).replace('$TOTAL_NO_STEPS', str(max_search_depth))
             ),
         ]
         self.self_reflection = self.filter_special_tags(chat(
@@ -97,7 +98,7 @@ class ThoughtNode:
             tmp_chat_history = self.previous_chat_history[:-1] + [
                 wrap_chat_message(
                     "user",
-                    EXPANSION_PROMPT.replace('$QUERY', initial_query).replace('$THOUGHTS', self.previous_agent_thoughts).replace('$STEP_NO', str(current_search_depth)).replace('$TOTAL_NO_STEPS', str(max_search_depth))
+                    EXPANSION_PROMPT.replace('$QUERY', initial_query).replace('$THOUGHTS', self.previous_agent_thoughts).replace('$REASONING_PHASE',REASONING_PHASES[(current_search_depth-1)//(max_search_depth//len(REASONING_PHASES))]).replace('$STEP_NO', str(current_search_depth)).replace('$TOTAL_NO_STEPS', str(max_search_depth))
                 ),
             ]
             tmp_chat_history.append(
@@ -179,9 +180,9 @@ class ThoughtNode:
             # Check if node is terminal
             print("Checking if reasoning is finished")
             ## Check for definite search completion
-            new_node.is_search_finished = 1 * (
-                new_node.q_value >= TERMINAL_SCORE_THRESHOLD
-            )
+            # new_node.is_search_finished = 1 * (
+            #     new_node.q_value >= TERMINAL_SCORE_THRESHOLD
+            # )
             if not new_node.is_search_finished:  ## Check for diminishing returns
                 if len(self.q_values) < 2:
                     new_node.is_search_finished = (
@@ -195,9 +196,9 @@ class ThoughtNode:
                     ]
 
                     # Check if improvements are below the threshold
-                    new_node.is_search_finished = 2 * all(
-                        abs(improvement) < DIMINISHING_RETURNS_THRESHOLD for improvement in improvements
-                    )
+                    # new_node.is_search_finished = 2 * all(
+                    #     abs(improvement) < DIMINISHING_RETURNS_THRESHOLD for improvement in improvements
+                    # )
             if not new_node.is_search_finished:  ## Check for max search depth
                 new_node.is_search_finished = 3 * (
                     len(new_node.agent_thoughts_deque) >= max_search_depth 
@@ -246,7 +247,7 @@ def search(previous_chat_history, max_search_depth):
         current_node.backpropagate()
         current_node.uct_update_children()
         current_node = current_node.select()
-        current_node.generate_self_reflection()
+        current_node.generate_self_reflection(max_search_depth, search_depth+1)
         search_depth += 1
 
     print(f"Completed {search_depth} expansions")
