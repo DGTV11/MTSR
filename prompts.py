@@ -5,7 +5,7 @@ THREE_POINT_ESTIMATE_TYPES = ["MOST OPTIMISTIC", "MOST LIKELY", "MOST PESSIMISTI
 REASONING_PHASES = [
     "query breakdown and response requirement analysis",
     "llm limitation checking",
-    "llm limitation workaround finding"
+    "llm limitation workaround finding",
     "main reasoning towards solution",
     "main reasoning towards solution",
     "reasoning chain checking",
