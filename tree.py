@@ -89,7 +89,7 @@ class ThoughtNode:
         tmp_chat_history = self.previous_chat_history[:-1] + [
             wrap_chat_message(
                 "user",
-                EXPANSION_PROMPT.replace("$QUERY", initial_query)
+                REFLECTION_PROMPT.replace("$QUERY", initial_query)
                 .replace("$THOUGHTS", self.previous_agent_thoughts)
                 .replace("$STEP_NO", str(current_search_depth))
                 .replace("$TOTAL_NO_STEPS", str(max_search_depth)),
@@ -106,6 +106,12 @@ class ThoughtNode:
 
     def expand_node(self, max_search_depth, current_search_depth):
         initial_query = self.previous_chat_history[-1]["content"]
+        current_reasoning_phase = REASONING_PHASES[
+            (current_search_depth - 1)
+            // (max_search_depth // len(REASONING_PHASES))
+        ]
+
+        print(f"Current reasoning phase: {current_reasoning_phase}")
 
         for i in range(NUMBER_OF_NEW_NODES_PER_EXPANSION):
             # Create new node
@@ -120,10 +126,7 @@ class ThoughtNode:
                     .replace("$THOUGHTS", self.previous_agent_thoughts)
                     .replace(
                         "$REASONING_PHASE",
-                        REASONING_PHASES[
-                            (current_search_depth - 1)
-                            // (max_search_depth // len(REASONING_PHASES))
-                        ],
+                        current_reasoning_phase,
                     )
                     .replace("$STEP_NO", str(current_search_depth))
                     .replace("$TOTAL_NO_STEPS", str(max_search_depth)),
@@ -143,34 +146,49 @@ class ThoughtNode:
 
             # Refine next reasoning step
             ## Get feedback
-            print("Getting feedback for generated reasoning step")
-            tmp_chat_history.append(
-                wrap_chat_message(
-                    "user", FEEDBACK_PROMPT.replace("$QUERY", initial_query)
-                )
-            )
-            assistant_message_content = chat(
-                model="reasoning",
-                messages=tmp_chat_history,
-            )["message"]["content"]
-            tmp_chat_history.append(
-                wrap_chat_message("assistant", assistant_message_content)
-            )
+           
+            for j in range(NUMBER_OF_SELF_REFINE_ITERATIONS):
+                if j>0:
+                    for k in range(4):
+                        tmp_chat_history.pop()
 
-            ## Update reasoning step
-            print("Updating reasoning step")
-            tmp_chat_history.append(
-                wrap_chat_message(
-                    "user", REFINE_PROMPT.replace("$QUERY", initial_query)
+                    tmp_chat_history.append(
+                        wrap_chat_message(
+                            "assistant",
+                            new_node.reasoning_step
+                        )
+                    )
+
+                print(f"SELF-REFINE iteration {j+1}/{NUMBER_OF_SELF_REFINE_ITERATIONS}")
+                print("Getting feedback for generated reasoning step")
+                tmp_chat_history.append(
+                    wrap_chat_message(
+                        "user", FEEDBACK_PROMPT.replace("$QUERY", initial_query)
+                    )
                 )
-            )
-            assistant_message_content = chat(
-                model="reasoning",
-                messages=tmp_chat_history,
-            )["message"]["content"]
-            new_node.reasoning_step = self.filter_special_tags(
-                assistant_message_content.strip()
-            )
+                assistant_message_content = chat(
+                    model="reasoning",
+                    messages=tmp_chat_history,
+                )["message"]["content"]
+                tmp_chat_history.append(
+                    wrap_chat_message("assistant", assistant_message_content)
+                )
+
+                ## Update reasoning step
+                print("Updating reasoning step")
+                tmp_chat_history.append(
+                    wrap_chat_message(
+                        "user", REFINE_PROMPT.replace("$QUERY", initial_query)
+                    )
+                )
+                assistant_message_content = chat(
+                    model="reasoning",
+                    messages=tmp_chat_history,
+                )["message"]["content"]
+                new_node.reasoning_step = self.filter_special_tags(
+                    assistant_message_content.strip()
+                )
+
             print("Reasoning step to be evaluated:")
             print(new_node.reasoning_step)
             print()
