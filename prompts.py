@@ -4,7 +4,9 @@ from constants import TERMINAL_SCORE_THRESHOLD
 THREE_POINT_ESTIMATE_TYPES = ["MOST OPTIMISTIC", "MOST LIKELY", "MOST PESSIMISTIC"]
 REASONING_PHASES = [
     "query breakdown and response requirement analysis",
-    "llm limitation checking and workaround finding",
+    "llm limitation checking",
+    "llm limitation workaround finding"
+    "main reasoning towards solution",
     "main reasoning towards solution",
     "reasoning chain checking",
 ]
