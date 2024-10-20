@@ -283,6 +283,8 @@ class ThoughtNode:
 
 
 def search(previous_chat_history, max_search_depth):
+    max_search_depth = max(max_search_depth, len(REASONING_PHASES))
+
     current_node = ThoughtNode(previous_chat_history)
 
     search_depth = 0
