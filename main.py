@@ -86,15 +86,16 @@ while True:
         clear_shell()
         if step["finished"]:
             thoughts = step["thoughts"]
-            match step["reason"]:
-                case 1:
-                    finished_reason = "definite search completion"
-                # case 2:
-                #     finished_reason = "diminishing returns"
-                case 3:
-                    finished_reason = "maximum search depth reached"
+            # match step["reason"]:
+            #     case 1:
+            #         finished_reason = "definite search completion"
+            #     case 2:
+            #         finished_reason = "diminishing returns"
+            #     case 3:
+            #         finished_reason = "maximum search depth reached"
             print(
-                f'Finished reasoning with a Q value of {step["q_value"]} because of {finished_reason}.'
+                # f'Finished reasoning with a Q value of {step["q_value"]} because of {finished_reason}.'
+                f'Finished reasoning with a Q value of {step["q_value"]}.'
             )
             print(f"Thoughts:\n\n{thoughts}\n\nResponse:")
         else:

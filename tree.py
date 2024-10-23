@@ -233,26 +233,24 @@ class ThoughtNode:
             # new_node.is_search_finished = 1 * (
             #     new_node.q_value >= TERMINAL_SCORE_THRESHOLD
             # )
-            if not new_node.is_search_finished:  ## Check for diminishing returns
-                if len(self.q_values) < 2:
-                    new_node.is_search_finished = (
-                        False  # Not enough data to determine diminishing returns
-                    )
-                else:
-                    # Calculate the improvements between consecutive Q-values
-                    improvements = [
-                        self.q_values[i] - self.q_values[i - 1]
-                        for i in range(1, len(self.q_values))
-                    ]
-
-                    # Check if improvements are below the threshold
-                    # new_node.is_search_finished = 2 * all(
-                    #     abs(improvement) < DIMINISHING_RETURNS_THRESHOLD for improvement in improvements
-                    # )
-            if not new_node.is_search_finished:  ## Check for max search depth
-                new_node.is_search_finished = 3 * (
-                    len(new_node.agent_thoughts_deque) >= max_search_depth
-                )
+            # if not new_node.is_search_finished:  ## Check for diminishing returns
+            #     if len(self.q_values) < 2:
+            #         new_node.is_search_finished = (
+            #             False  # Not enough data to determine diminishing returns
+            #         )
+            #     else:
+            #         # Calculate the improvements between consecutive Q-values
+            #         improvements = [
+            #             self.q_values[i] - self.q_values[i - 1]
+            #             for i in range(1, len(self.q_values))
+            #         ]
+            #
+            #         # Check if improvements are below the threshold
+            #         # new_node.is_search_finished = 2 * all(
+            #         #     abs(improvement) < DIMINISHING_RETURNS_THRESHOLD for improvement in improvements
+            #         # )
+            # if not new_node.is_search_finished:  ## Check for max search depth
+            new_node.is_search_finished = len(new_node.agent_thoughts_deque) >= max_search_depth
 
             # Append node to children
             self.children.append(new_node)
