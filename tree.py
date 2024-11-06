@@ -121,7 +121,7 @@ class ThoughtNode:
 
     def expand_node(self, max_search_depth, current_search_depth, reasoning_phases):
         initial_query = self.previous_chat_history[-1]["content"]
-        current_reasoning_phase = reasoning_phases[current_search_depth]
+        current_reasoning_phase = reasoning_phases[current_search_depth-1]
 
         print(f"Current reasoning phase: {current_reasoning_phase}")
 
