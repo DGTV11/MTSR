@@ -210,7 +210,7 @@ class ThoughtNode:
                 wrap_chat_message("assistant", new_node.reasoning_step),
                 wrap_chat_message(
                     "user",
-                    generate_evaluation_prompt(reasoning_phases).replace(
+                    EVALUATION_PROMPT.replace(
                         "$QUERY", initial_query
                     ),
                 ),
