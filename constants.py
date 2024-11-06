@@ -17,6 +17,7 @@ UCT_C = math.sqrt(2)
 VERBOSE_MODE = True
 SHOW_THOUGHTS_AFTER_EACH_STEP = True
 
+
 # Helper functions
 def clear_shell():
     if os_name == "nt":
@@ -24,12 +25,15 @@ def clear_shell():
     else:
         shell("clear")
 
+
 def printd(string):
     if VERBOSE_MODE:
         print(string)
 
+
 def clear_shelld():
     if VERBOSE_MODE:
         clear_shell()
+
 
 wrap_chat_message = lambda role, content: {"role": role, "content": content}

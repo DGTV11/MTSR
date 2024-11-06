@@ -19,6 +19,7 @@ def clear_shell():
     pass
 """
 
+
 def mtsr(messages):
     if messages[-1]["role"] != "user":
         raise ValueError("Last message must be a user message")
@@ -30,10 +31,8 @@ def mtsr(messages):
         wrap_chat_message(
             "user",
             NO_OF_MAIN_REASONING_STEPS_ESTIMATION_PROMPT.replace(
-                "$QUERY", messages[-1]["content"]).replace(
-                    "$ESTIMATION_TYPE", estimation_type
-                ),
-            ),
+                "$QUERY", messages[-1]["content"]
+            ).replace("$ESTIMATION_TYPE", estimation_type),
         )
     ]
 
@@ -73,9 +72,7 @@ def mtsr(messages):
     for step in search(messages, reasoning_phases):
         clear_shelld()
         if step["finished"]:
-            printd(
-                f'Finished reasoning with a Q value of {step["q_value"]}.'
-            )
+            printd(f'Finished reasoning with a Q value of {step["q_value"]}.')
 
             printd(f'Thoughts:\n{step["thoughts"]}')
         else:
@@ -86,9 +83,9 @@ def mtsr(messages):
     tmp_chat_history = global_chat_history[:-1] + [
         wrap_chat_message(
             "user",
-            GENERATION_PROMPT.replace(
-                "$QUERY", messages[-1]["content"]
-            ).replace("$THOUGHTS", thoughts),
+            GENERATION_PROMPT.replace("$QUERY", messages[-1]["content"]).replace(
+                "$THOUGHTS", thoughts
+            ),
         )
     ]
     response = chat(
@@ -100,7 +97,8 @@ def mtsr(messages):
 
     end_time = time.time()
 
-    return messages+[wrap_chat_message("assistant", response)], end_time-start_time
+    return messages + [wrap_chat_message("assistant", response)], end_time - start_time
+
 
 if __name__ == "__main__":
     clear_shell()
@@ -112,7 +110,7 @@ if __name__ == "__main__":
         clear_shell()
 
         global_chat_history, time_taken = mtsr(global_chat_history)
-        
+
         clear_shell()
 
         for i, message in enumerate(global_chat_history, start=1):

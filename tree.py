@@ -6,6 +6,7 @@ from llm import *
 from constants import *
 from prompts import *
 
+
 class ThoughtNode:
     def __init__(self, previous_chat_history=None, parent=None):
         self.previous_chat_history = previous_chat_history
@@ -94,31 +95,9 @@ class ThoughtNode:
             .replace("</reflection>", "")
         )
 
-    def generate_self_reflection(self, max_search_depth, current_search_depth):
-        initial_query = self.previous_chat_history[-1]["content"]
-
-        printd(f"Generating self-reflection")
-        tmp_chat_history = self.previous_chat_history[:-1] + [
-            wrap_chat_message(
-                "user",
-                REFLECTION_PROMPT.replace("$QUERY", initial_query)
-                .replace("$THOUGHTS", self.previous_agent_thoughts)
-                .replace("$STEP_NO", str(current_search_depth))
-                .replace("$TOTAL_NO_STEPS", str(max_search_depth)),
-            ),
-        ]
-        self.self_reflection = self.filter_special_tags(
-            chat(
-                model="reasoning",
-                messages=tmp_chat_history,
-            )[
-                "message"
-            ]["content"].strip()
-        )
-
     def expand_node(self, max_search_depth, current_search_depth, reasoning_phases):
         initial_query = self.previous_chat_history[-1]["content"]
-        current_reasoning_phase = reasoning_phases[current_search_depth-1]
+        current_reasoning_phase = reasoning_phases[current_search_depth - 1]
 
         printd(f"Current reasoning phase: {current_reasoning_phase}")
 
@@ -165,7 +144,9 @@ class ThoughtNode:
                         wrap_chat_message("assistant", new_node.reasoning_step)
                     )
 
-                printd(f"SELF-REFINE iteration {j+1}/{NUMBER_OF_SELF_REFINE_ITERATIONS}")
+                printd(
+                    f"SELF-REFINE iteration {j+1}/{NUMBER_OF_SELF_REFINE_ITERATIONS}"
+                )
                 printd("Getting feedback for generated reasoning step")
                 tmp_chat_history.append(
                     wrap_chat_message(
@@ -207,9 +188,7 @@ class ThoughtNode:
                 wrap_chat_message("assistant", new_node.reasoning_step),
                 wrap_chat_message(
                     "user",
-                    EVALUATION_PROMPT.replace(
-                        "$QUERY", initial_query
-                    ),
+                    EVALUATION_PROMPT.replace("$QUERY", initial_query),
                 ),
             ]
             r = []
@@ -289,6 +268,28 @@ class ThoughtNode:
 
     def select(self):
         return max(self.children, key=lambda c: c.uct_value)
+
+    def generate_self_reflection(self, max_search_depth, current_search_depth):
+        initial_query = self.previous_chat_history[-1]["content"]
+
+        printd(f"Generating self-reflection")
+        tmp_chat_history = self.previous_chat_history[:-1] + [
+            wrap_chat_message(
+                "user",
+                REFLECTION_PROMPT.replace("$QUERY", initial_query)
+                .replace("$THOUGHTS", self.previous_agent_thoughts)
+                .replace("$STEP_NO", str(current_search_depth))
+                .replace("$TOTAL_NO_STEPS", str(max_search_depth)),
+            ),
+        ]
+        self.self_reflection = self.filter_special_tags(
+            chat(
+                model="reasoning",
+                messages=tmp_chat_history,
+            )[
+                "message"
+            ]["content"].strip()
+        )
 
 
 def search(previous_chat_history, reasoning_phases):
