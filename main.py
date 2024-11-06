@@ -135,5 +135,6 @@ while True:
                 f"{message['role']} (with thoughts) > {thoughts}\n\n{message['content']}"
             )
     print(
-        f'=============================\nFinished reasoning with a Q value of {step["q_value"]} in {str(datetime.timedelta(seconds=time_taken))} because of {finished_reason}.'
+        #f'=============================\nFinished reasoning with a Q value of {step["q_value"]} in {str(datetime.timedelta(seconds=time_taken))} because of {finished_reason}.'
+        f'=============================\nFinished reasoning with a Q value of {step["q_value"]} in {str(datetime.timedelta(seconds=time_taken))}.'
     )
