@@ -47,7 +47,7 @@ while True:
         tmp_chat_history = global_chat_history[:-1] + [
             wrap_chat_message(
                 "user",
-                MAX_ROLLOUT_ESTIMATION_PROMPT.replace(
+                NO_OF_MAIN_REASONING_STEPS_ESTIMATION_PROMPT.replace(
                     "$QUERY",
                     global_chat_history[-1]["content"].replace(
                         "$ESTIMATION_TYPE", estimation_type
