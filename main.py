@@ -1,6 +1,4 @@
 import sys
-from os import system as shell
-from os import name as os_name
 import re
 import time
 import datetime

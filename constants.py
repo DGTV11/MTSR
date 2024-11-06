@@ -1,5 +1,6 @@
 import math
-
+from os import system as shell
+from os import name as os_name
 
 ## User variables
 # OLLAMA_LLM = "gemma2:2b-instruct-q5_0"
