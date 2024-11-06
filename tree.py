@@ -119,11 +119,9 @@ class ThoughtNode:
             ]["content"].strip()
         )
 
-    def expand_node(self, max_search_depth, current_search_depth):
+    def expand_node(self, max_search_depth, current_search_depth, reasoning_phases):
         initial_query = self.previous_chat_history[-1]["content"]
-        current_reasoning_phase = REASONING_PHASES[
-            (current_search_depth - 1) // (max_search_depth // len(REASONING_PHASES))
-        ]
+        current_reasoning_phase = reasoning_phases[current_search_depth]
 
         print(f"Current reasoning phase: {current_reasoning_phase}")
 
@@ -211,7 +209,10 @@ class ThoughtNode:
                 wrap_chat_message("user", EXPANSION_PROMPT),
                 wrap_chat_message("assistant", new_node.reasoning_step),
                 wrap_chat_message(
-                    "user", EVALUATION_PROMPT.replace("$QUERY", initial_query)
+                    "user",
+                    generate_evaluation_prompt(reasoning_phases).replace(
+                        "$QUERY", initial_query
+                    ),
                 ),
             ]
             r = []
@@ -261,7 +262,9 @@ class ThoughtNode:
             #         #     abs(improvement) < DIMINISHING_RETURNS_THRESHOLD for improvement in improvements
             #         # )
             # if not new_node.is_search_finished:  ## Check for max search depth
-            new_node.is_search_finished = len(new_node.agent_thoughts_deque) >= max_search_depth
+            new_node.is_search_finished = (
+                len(new_node.agent_thoughts_deque) >= max_search_depth
+            )
 
             # Append node to children
             self.children.append(new_node)
@@ -291,8 +294,8 @@ class ThoughtNode:
         return max(self.children, key=lambda c: c.uct_value)
 
 
-def search(previous_chat_history, max_search_depth):
-    max_search_depth = max(max_search_depth, len(REASONING_PHASES))
+def search(previous_chat_history, reasoning_phases):
+    max_search_depth = len(reasoning_phases)
 
     current_node = ThoughtNode(previous_chat_history)
 
@@ -304,7 +307,7 @@ def search(previous_chat_history, max_search_depth):
             "q_value": current_node.q_value,
         }
         print(f"Current search depth: {search_depth+1}/{max_search_depth}")
-        current_node.expand_node(max_search_depth, search_depth + 1)
+        current_node.expand_node(max_search_depth, search_depth + 1, reasoning_phases)
         current_node.backpropagate()
         current_node.uct_update_children()
         current_node = current_node.select()

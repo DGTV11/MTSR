@@ -36,12 +36,12 @@ while True:
 
     start_time = time.time()
 
-    # Estimation of required no. of rollouts
+    # Reasoning phase list generation
     clear_shell()
     estimations = []
     for i, estimation_type in enumerate(THREE_POINT_ESTIMATE_TYPES):
         print(
-            f"Getting max depth estimate {i+1}/{len(THREE_POINT_ESTIMATE_TYPES)} ({estimation_type.lower()} estimate)"
+            f"Getting main reasoning phase count estimate {i+1}/{len(THREE_POINT_ESTIMATE_TYPES)} ({estimation_type.lower()} estimate)"
         )
 
         tmp_chat_history = global_chat_history[:-1] + [
@@ -74,15 +74,16 @@ while True:
             single_estimation = max(int(res[-1]), 1)
             estimations.append(single_estimation)
 
-    max_search_depth = min(
-        ((estimations[0] + 4 * estimations[1] + estimations[2]) // 6)
-        * len(REASONING_PHASES),
-        SEARCH_DEPTH_CAP,
+    reasoning_phases = generate_reasoning_phases(
+        min(
+            ((estimations[0] + 4 * estimations[1] + estimations[2]) // 6),
+            MAX_NO_MAIN_REASONING_PHASES,
+        )
     )
 
     # Thinking
     thoughts = ""
-    for step in search(global_chat_history, max_search_depth):
+    for step in search(global_chat_history, reasoning_phases):
         clear_shell()
         if step["finished"]:
             thoughts = step["thoughts"]
@@ -135,6 +136,6 @@ while True:
                 f"{message['role']} (with thoughts) > {thoughts}\n\n{message['content']}"
             )
     print(
-        #f'=============================\nFinished reasoning with a Q value of {step["q_value"]} in {str(datetime.timedelta(seconds=time_taken))} because of {finished_reason}.'
+        # f'=============================\nFinished reasoning with a Q value of {step["q_value"]} in {str(datetime.timedelta(seconds=time_taken))} because of {finished_reason}.'
         f'=============================\nFinished reasoning with a Q value of {step["q_value"]} in {str(datetime.timedelta(seconds=time_taken))}.'
     )
