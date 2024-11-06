@@ -6,9 +6,6 @@ from llm import *
 from constants import *
 from prompts import *
 
-wrap_chat_message = lambda role, content: {"role": role, "content": content}
-
-
 class ThoughtNode:
     def __init__(self, previous_chat_history=None, parent=None):
         self.previous_chat_history = previous_chat_history
@@ -100,7 +97,7 @@ class ThoughtNode:
     def generate_self_reflection(self, max_search_depth, current_search_depth):
         initial_query = self.previous_chat_history[-1]["content"]
 
-        print(f"Generating self-reflection")
+        printd(f"Generating self-reflection")
         tmp_chat_history = self.previous_chat_history[:-1] + [
             wrap_chat_message(
                 "user",
@@ -123,14 +120,14 @@ class ThoughtNode:
         initial_query = self.previous_chat_history[-1]["content"]
         current_reasoning_phase = reasoning_phases[current_search_depth-1]
 
-        print(f"Current reasoning phase: {current_reasoning_phase}")
+        printd(f"Current reasoning phase: {current_reasoning_phase}")
 
         for i in range(NUMBER_OF_NEW_NODES_PER_EXPANSION):
             # Create new node
-            print(f"Creating thought node {i+1}/{NUMBER_OF_NEW_NODES_PER_EXPANSION}")
+            printd(f"Creating thought node {i+1}/{NUMBER_OF_NEW_NODES_PER_EXPANSION}")
             new_node = ThoughtNode(self.previous_chat_history, self)
             # Generate next reasoning step
-            print("Generating next reasoning step")
+            printd("Generating next reasoning step")
             tmp_chat_history = self.previous_chat_history[:-1] + [
                 wrap_chat_message(
                     "user",
@@ -168,8 +165,8 @@ class ThoughtNode:
                         wrap_chat_message("assistant", new_node.reasoning_step)
                     )
 
-                print(f"SELF-REFINE iteration {j+1}/{NUMBER_OF_SELF_REFINE_ITERATIONS}")
-                print("Getting feedback for generated reasoning step")
+                printd(f"SELF-REFINE iteration {j+1}/{NUMBER_OF_SELF_REFINE_ITERATIONS}")
+                printd("Getting feedback for generated reasoning step")
                 tmp_chat_history.append(
                     wrap_chat_message(
                         "user", FEEDBACK_PROMPT.replace("$QUERY", initial_query)
@@ -184,7 +181,7 @@ class ThoughtNode:
                 )
 
                 ## Update reasoning step
-                print("Updating reasoning step")
+                printd("Updating reasoning step")
                 tmp_chat_history.append(
                     wrap_chat_message(
                         "user", REFINE_PROMPT.replace("$QUERY", initial_query)
@@ -198,12 +195,12 @@ class ThoughtNode:
                     assistant_message_content.strip()
                 )
 
-            print("Reasoning step to be evaluated:")
-            print(new_node.reasoning_step)
-            print()
+            printd("Reasoning step to be evaluated:")
+            printd(new_node.reasoning_step)
+            printd()
 
             # Evaluate reasoning step
-            print("Evaluating refined reasoning step")
+            printd("Evaluating refined reasoning step")
             tmp_chat_history = self.previous_chat_history + [
                 wrap_chat_message("assistant", self.previous_agent_thoughts),
                 wrap_chat_message("user", EXPANSION_PROMPT),
@@ -217,12 +214,12 @@ class ThoughtNode:
             ]
             r = []
             for j in range(NUMBER_OF_REWARD_SAMPLES):
-                print(f"Getting sample {j+1}/{NUMBER_OF_REWARD_SAMPLES}")
+                printd(f"Getting sample {j+1}/{NUMBER_OF_REWARD_SAMPLES}")
                 k = 0
                 res = []
                 while not res:
                     k += 1
-                    print(f"Attempt no. {k}")
+                    printd(f"Attempt no. {k}")
                     evaluation_raw_txt = chat(
                         model="reasoning",
                         messages=tmp_chat_history,
@@ -237,10 +234,10 @@ class ThoughtNode:
 
             new_node.q_value = 0.5 * (min(r) + (sum(r) / NUMBER_OF_REWARD_SAMPLES))
             new_node.n_value = NUMBER_OF_REWARD_SAMPLES
-            print(f"Reasoning step got a Q value of {new_node.q_value}")
+            printd(f"Reasoning step got a Q value of {new_node.q_value}")
 
             # Check if node is terminal
-            print("Checking if reasoning is finished")
+            printd("Checking if reasoning is finished")
             ## Check for definite search completion
             # new_node.is_search_finished = 1 * (
             #     new_node.q_value >= TERMINAL_SCORE_THRESHOLD
@@ -268,7 +265,7 @@ class ThoughtNode:
 
             # Append node to children
             self.children.append(new_node)
-            print("\n")
+            printd("\n")
 
             # Check if expansion should stop early
             if self.parent and new_node.q_value > self.q_value:
@@ -306,7 +303,7 @@ def search(previous_chat_history, reasoning_phases):
             "thoughts": current_node.agent_thoughts,
             "q_value": current_node.q_value,
         }
-        print(f"Current search depth: {search_depth+1}/{max_search_depth}")
+        printd(f"Current search depth: {search_depth+1}/{max_search_depth}")
         current_node.expand_node(max_search_depth, search_depth + 1, reasoning_phases)
         current_node.backpropagate()
         current_node.uct_update_children()
@@ -314,7 +311,7 @@ def search(previous_chat_history, reasoning_phases):
         current_node.generate_self_reflection(max_search_depth, search_depth + 1)
         search_depth += 1
 
-    print(f"Completed {search_depth} expansions")
+    printd(f"Completed {search_depth} expansions")
 
     yield {
         "finished": True,

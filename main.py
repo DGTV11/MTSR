@@ -11,16 +11,7 @@ from constants import *
 from prompts import *
 from tree import search
 
-wrap_chat_message = lambda role, content: {"role": role, "content": content}
-
 global_chat_history = [wrap_chat_message("system", LLM_SYSTEM_PROMPT)]
-
-
-def clear_shell():
-    if os_name == "nt":
-        shell("cls")
-    else:
-        shell("clear")
 
 
 """
@@ -48,7 +39,7 @@ def mtsr(messages):
 
     estimations = []
     for i, estimation_type in enumerate(THREE_POINT_ESTIMATE_TYPES):
-        print(
+        printd(
             f"Getting main reasoning phase count estimate {i+1}/{len(THREE_POINT_ESTIMATE_TYPES)} ({estimation_type.lower()} estimate)"
         )
 
@@ -56,7 +47,7 @@ def mtsr(messages):
         res = []
         while not res:
             j += 1
-            print(f"Attempt no. {j}")
+            printd(f"Attempt no. {j}")
             evaluation_raw_txt = chat(
                 model="reasoning",
                 messages=tmp_chat_history,
@@ -80,24 +71,16 @@ def mtsr(messages):
     # Thinking
     thoughts = ""
     for step in search(messages, reasoning_phases):
-        clear_shell()
+        clear_shelld()
         if step["finished"]:
-            thoughts = step["thoughts"]
-            # match step["reason"]:
-            #     case 1:
-            #         finished_reason = "definite search completion"
-            #     case 2:
-            #         finished_reason = "diminishing returns"
-            #     case 3:
-            #         finished_reason = "maximum search depth reached"
-            print(
-                # f'Finished reasoning with a Q value of {step["q_value"]} because of {finished_reason}.'
+            printd(
                 f'Finished reasoning with a Q value of {step["q_value"]}.'
             )
-            print(f"Thoughts:\n\n{thoughts}\n\nResponse:")
+
+            printd(f'Thoughts:\n{step["thoughts"]}')
         else:
-            print(f'Current best node has a Q value of {step["q_value"]}')
-            print(f'Thoughts:\n{step["thoughts"]}')
+            printd(f'Current best node has a Q value of {step["q_value"]}')
+            printd(f'Thoughts:\n{step["thoughts"]}')
 
     # Response
     tmp_chat_history = global_chat_history[:-1] + [
@@ -114,7 +97,6 @@ def mtsr(messages):
     )[
         "message"
     ]["content"]
-    print(response)
 
     end_time = time.time()
 

@@ -1,5 +1,6 @@
 import math
 
+
 ## User variables
 # OLLAMA_LLM = "gemma2:2b-instruct-q5_0"
 
@@ -13,3 +14,22 @@ DIMINISHING_RETURNS_THRESHOLD = 0.01
 OVERSCORE_REDUCTION_CONSTANT = 5
 UCT_E = 0.1
 UCT_C = math.sqrt(2)
+VERBOSE_MODE = True
+SHOW_THOUGHTS_AFTER_EACH_STEP = True
+
+# Helper functions
+def clear_shell():
+    if os_name == "nt":
+        shell("cls")
+    else:
+        shell("clear")
+
+def printd(string):
+    if VERBOSE_MODE:
+        print(string)
+
+def clear_shelld():
+    if VERBOSE_MODE:
+        clear_shell()
+
+wrap_chat_message = lambda role, content: {"role": role, "content": content}
