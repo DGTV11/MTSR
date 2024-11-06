@@ -25,20 +25,20 @@ def mtsr(messages):
     start_time = time.time()
 
     # Reasoning phase list generation
-    tmp_chat_history = messages[:-1] + [
-        wrap_chat_message(
-            "user",
-            NO_OF_MAIN_REASONING_STEPS_ESTIMATION_PROMPT.replace(
-                "$QUERY", messages[-1]["content"]
-            ).replace("$ESTIMATION_TYPE", estimation_type),
-        )
-    ]
-
     estimations = []
     for i, estimation_type in enumerate(THREE_POINT_ESTIMATE_TYPES):
         printd(
             f"Getting main reasoning phase count estimate {i+1}/{len(THREE_POINT_ESTIMATE_TYPES)} ({estimation_type.lower()} estimate)"
         )
+
+        tmp_chat_history = messages[:-1] + [
+            wrap_chat_message(
+                "user",
+                NO_OF_MAIN_REASONING_STEPS_ESTIMATION_PROMPT.replace(
+                    "$QUERY", messages[-1]["content"]
+                ).replace("$ESTIMATION_TYPE", estimation_type),
+            )
+        ]
 
         j = 0
         res = []
