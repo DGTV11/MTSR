@@ -28,33 +28,29 @@ def clear_shell():
     pass
 """
 
-clear_shell()
-while True:
-    print("user (press Ctrl+D to finish) >")
-    user_message = sys.stdin.read()
-    global_chat_history.append(wrap_chat_message("user", user_message))
+def mtsr(messages):
+    if messages[-1]["role"] != "user":
+        raise ValueError("Last message must be a user message")
 
     start_time = time.time()
 
     # Reasoning phase list generation
-    clear_shell()
+    tmp_chat_history = messages[:-1] + [
+        wrap_chat_message(
+            "user",
+            NO_OF_MAIN_REASONING_STEPS_ESTIMATION_PROMPT.replace(
+                "$QUERY", messages[-1]["content"]).replace(
+                    "$ESTIMATION_TYPE", estimation_type
+                ),
+            ),
+        )
+    ]
+
     estimations = []
     for i, estimation_type in enumerate(THREE_POINT_ESTIMATE_TYPES):
         print(
             f"Getting main reasoning phase count estimate {i+1}/{len(THREE_POINT_ESTIMATE_TYPES)} ({estimation_type.lower()} estimate)"
         )
-
-        tmp_chat_history = global_chat_history[:-1] + [
-            wrap_chat_message(
-                "user",
-                NO_OF_MAIN_REASONING_STEPS_ESTIMATION_PROMPT.replace(
-                    "$QUERY",
-                    global_chat_history[-1]["content"].replace(
-                        "$ESTIMATION_TYPE", estimation_type
-                    ),
-                ),
-            )
-        ]
 
         j = 0
         res = []
@@ -83,7 +79,7 @@ while True:
 
     # Thinking
     thoughts = ""
-    for step in search(global_chat_history, reasoning_phases):
+    for step in search(messages, reasoning_phases):
         clear_shell()
         if step["finished"]:
             thoughts = step["thoughts"]
@@ -108,7 +104,7 @@ while True:
         wrap_chat_message(
             "user",
             GENERATION_PROMPT.replace(
-                "$QUERY", global_chat_history[-1]["content"]
+                "$QUERY", messages[-1]["content"]
             ).replace("$THOUGHTS", thoughts),
         )
     ]
@@ -119,23 +115,35 @@ while True:
         "message"
     ]["content"]
     print(response)
-    global_chat_history.append(wrap_chat_message("assistant", response))
 
     end_time = time.time()
-    time_taken = end_time - start_time
 
+    return messages+[wrap_chat_message("assistant", response)], end_time-start_time
+
+if __name__ == "__main__":
     clear_shell()
-    for i, message in enumerate(global_chat_history, start=1):
-        if message["role"] == "system":
-            continue
+    while True:
+        print("user (press Ctrl+D to finish) >")
+        user_message = sys.stdin.read()
+        global_chat_history.append(wrap_chat_message("user", user_message))
 
-        if i < len(global_chat_history):
-            print(f"{message['role']} > {message['content']}")
-        else:
-            print(
-                f"{message['role']} (with thoughts) > {thoughts}\n\n{message['content']}"
-            )
-    print(
-        # f'=============================\nFinished reasoning with a Q value of {step["q_value"]} in {str(datetime.timedelta(seconds=time_taken))} because of {finished_reason}.'
-        f'=============================\nFinished reasoning with a Q value of {step["q_value"]} in {str(datetime.timedelta(seconds=time_taken))}.'
-    )
+        clear_shell()
+
+        global_chat_history, time_taken = mtsr(global_chat_history)
+        
+        clear_shell()
+
+        for i, message in enumerate(global_chat_history, start=1):
+            if message["role"] == "system":
+                continue
+
+            if i < len(global_chat_history):
+                print(f"{message['role']} > {message['content']}")
+            else:
+                print(
+                    f"{message['role']} (with thoughts) > {thoughts}\n\n{message['content']}"
+                )
+        print(
+            # f'=============================\nFinished reasoning with a Q value of {step["q_value"]} in {str(datetime.timedelta(seconds=time_taken))} because of {finished_reason}.'
+            f'=============================\nFinished reasoning with a Q value of {step["q_value"]} in {str(datetime.timedelta(seconds=time_taken))}.'
+        )
