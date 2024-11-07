@@ -27,7 +27,7 @@ def clear_shell():
         shell("clear")
 
 
-def printd(string):
+def printd(string=""):
     if VERBOSE_MODE:
         print(string)
 
