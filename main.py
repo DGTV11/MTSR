@@ -95,7 +95,7 @@ def mtsr(messages):
 
     end_time = time.time()
 
-    return messages + [wrap_chat_message("assistant", response)], end_time - start_time
+    return messages + [wrap_chat_message("assistant", response)], thoughts, end_time - start_time
 
 
 if __name__ == "__main__":
@@ -107,7 +107,7 @@ if __name__ == "__main__":
 
         clear_shell()
 
-        global_chat_history, time_taken = mtsr(global_chat_history)
+        global_chat_history, thoughts, time_taken = mtsr(global_chat_history)
 
         clear_shell()
 
