@@ -58,12 +58,12 @@ def mtsr(messages):
             single_estimation = max(int(res[-1]), 1)
             estimations.append(single_estimation)
 
-    reasoning_phases = generate_reasoning_phases(
-        min(
-            ((estimations[0] + 4 * estimations[1] + estimations[2]) // 6),
-            MAX_NO_MAIN_REASONING_PHASES,
-        )
+    no_main_phases = min(
+        ((estimations[0] + 4 * estimations[1] + estimations[2]) // 6),
+        MAX_NO_MAIN_REASONING_PHASES,
     )
+
+    reasoning_phases = generate_reasoning_phases(no_main_phases)
 
     # Thinking
     thoughts = ""
@@ -95,7 +95,7 @@ def mtsr(messages):
 
     end_time = time.time()
 
-    return messages + [wrap_chat_message("assistant", response)], thoughts, step["q_value"], end_time - start_time
+    return messages + [wrap_chat_message("assistant", response)], thoughts, no_main_phases, step["q_value"], end_time - start_time
 
 
 if __name__ == "__main__":
@@ -107,7 +107,7 @@ if __name__ == "__main__":
 
         clear_shell()
 
-        global_chat_history, thoughts, final_q_value, time_taken = mtsr(global_chat_history)
+        global_chat_history, thoughts, no_main_phases, final_q_value, time_taken = mtsr(global_chat_history)
 
         clear_shell()
 
@@ -123,5 +123,5 @@ if __name__ == "__main__":
                 )
         print(
             # f'=============================\nFinished reasoning with a Q value of {step["q_value"]} in {str(datetime.timedelta(seconds=time_taken))} because of {finished_reason}.'
-            f'=============================\nFinished reasoning with a Q value of {final_q_value} in {str(datetime.timedelta(seconds=time_taken))}.'
+            f'=============================\nFinished reasoning with a Q value of {final_q_value} and {no_main_phases} main reasoning steps in {str(datetime.timedelta(seconds=time_taken))}.'
         )
