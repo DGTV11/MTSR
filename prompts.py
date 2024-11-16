@@ -5,11 +5,11 @@ surround_with_quotes = lambda s: f'"{s}"'
 generate_reasoning_phases = (
     lambda no_main_phases: [
         "query breakdown and response requirement analysis",
-        "llm limitation checking",
-        "llm limitation workaround finding",
+        "large language model limitation checking",
+        "large language model limitation workaround generation",
     ]
-    + no_main_phases * ["main reasoning towards solution"]
-    + ["reasoning chain checking"]
+    + no_main_phases * ["main reasoning towards solution", "future reasoning step planning"]
+    + ["final reasoning chain checking"]
 )
 
 # Prompt modifier variables
