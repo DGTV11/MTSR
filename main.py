@@ -73,6 +73,7 @@ def mtsr(messages):
             printd(f'Finished reasoning with a Q value of {step["q_value"]}.')
 
             printd(f'Thoughts:\n{step["thoughts"]}')
+            thoughts = step["thoughts"]
         else:
             printd(f'Current best node has a Q value of {step["q_value"]}')
             printd(f'Thoughts:\n{step["thoughts"]}')
